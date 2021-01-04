@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 project(pac_man C)
 
 set(CMAKE_C_STANDARD 99)
-set(SOURCE_FILES main.c objects/pacman.c objects/pacman.h)
+set(SOURCE_FILES main.c objects/pacman.c objects/pacman.h main/LTexture.c main/LTexture.h common/pac_common.c common/pac_common.h)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lmingw32")
 set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
