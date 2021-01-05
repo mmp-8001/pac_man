@@ -4,7 +4,7 @@
 
 #include "pac_common.h"
 
-//the name of our app
+//The name of our app
 const char gAppName[] = "PAC-MAN";
 
 //Screen dimension constants
@@ -17,7 +17,7 @@ SDL_Window *gWindow = NULL;
 //The window renderer
 SDL_Renderer *gRenderer = NULL;
 
-//this function check lib, init SDL and SDL_Image, create renderer and window
+//This function check lib, init SDL and SDL_Image, create renderer and window
 bool app_init() {
     //Initialization flag
     bool success = true;
@@ -58,4 +58,17 @@ bool app_init() {
         }
     }
     return success;
+}
+
+//This function close our application
+void app_close() {
+    //Destroy window
+    SDL_DestroyRenderer(gRenderer);
+    SDL_DestroyWindow(gWindow);
+    gWindow = NULL;
+    gRenderer = NULL;
+
+    //Quit SDL subsystems
+    IMG_Quit();
+    SDL_Quit();
 }

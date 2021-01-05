@@ -4,7 +4,7 @@
 
 #include "LTexture.h"
 
-//this function clear memory and deallocate
+//This function clear memory and deallocate
 void LTexture_free(LTexture *obj) {
     //Free texture if it exists
     if (obj->mTexture != NULL) {
@@ -15,9 +15,9 @@ void LTexture_free(LTexture *obj) {
     }
 }
 
-//this function load surface from specified file
+//This function load surface from specified file
 bool LTexture_loadFromFile(LTexture *obj, char *path) {
-    //free up if we have data in that chunk of memory
+    //Free up if we have data in that chunk of memory
     LTexture_free(obj);
 
     //The final texture
@@ -44,12 +44,12 @@ bool LTexture_loadFromFile(LTexture *obj, char *path) {
         SDL_FreeSurface(loadedSurface);
     }
 
-//Return success
+    //Return success
     obj->mTexture = newTexture;
     return obj->mTexture != NULL;
 }
 
-//this function render our loaded surface to window
+//This function render our loaded surface to window
 void
 LTexture_render(LTexture *obj, int x, int y, SDL_Rect *clip, double angle, SDL_Point *center, SDL_RendererFlip flip) {
     //Set rendering space and render to screen
