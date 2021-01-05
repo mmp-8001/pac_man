@@ -29,9 +29,12 @@ int main(int argc, char *argv[]) {
         SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
         SDL_RenderClear(gRenderer);
 
+        //Animate pacman
+        PACMAN_action(&pacMan);
+        //move pacman
+        PACMAN_move(&pacMan);
         //Render pacman to window
         PACMAN_render(&pacMan);
-        PACMAN_action(&pacMan);
 
         //Update screen
         SDL_RenderPresent(gRenderer);

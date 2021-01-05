@@ -10,7 +10,7 @@ void create_status();
 //Const global variable for our pacman
 const int PACMAN_WIDTH = 30;
 const int PACMAN_HEIGHT = 30;
-const int PACMAN_VEL = 10;
+const int PACMAN_VEL = 1;
 const int WALKING_ANIMATION_FRAMES = 5;
 const int ANIMATION_DELAY = 8;
 char PACMAN_PIC[] = "../assets/pacman.png";
@@ -88,6 +88,44 @@ void PACMAN_handle(PACMAN *obj, SDL_Event e) {
                 obj->angle = 180;
                 break;
         }
+    }
+}
+
+//This function move pacman according to it's direction
+void PACMAN_move(PACMAN *obj) {
+    int vel = obj->pVelocity;
+    switch (obj->angle) {
+        //Pacman face to up
+        case 270:
+            obj->pPosy -= vel;
+            if (obj->pPosy <= -20) {
+                obj->pPosy = SCREEN_HEIGHT;
+            }
+            break;
+
+            //Pacman face to down
+        case 90:
+            obj->pPosy += vel;
+            if (obj->pPosy - 10 >= SCREEN_HEIGHT) {
+                obj->pPosy = -20;
+            }
+            break;
+
+            //Pacman face to right
+        case 0:
+            obj->pPosx += vel;
+            if (obj->pPosx - 10 >= SCREEN_WIDTH) {
+                obj->pPosx = -20;
+            }
+            break;
+
+            //Pacman face to left
+        case 180:
+            obj->pPosx -= vel;
+            if (obj->pPosx <= -20) {
+                obj->pPosx = SCREEN_WIDTH + 10;
+            }
+            break;
     }
 }
 

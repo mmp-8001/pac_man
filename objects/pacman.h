@@ -36,4 +36,7 @@ extern void PACMAN_action(PACMAN *obj);
 //Extern pacman handle to handle direction of pacman
 extern void PACMAN_handle(PACMAN *obj, SDL_Event e);
 
+//Extern pacman move to move pacman according to it's direction
+extern void PACMAN_move(PACMAN *obj);
+
 #endif //PAC_MAN_PACMAN_H
