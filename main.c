@@ -1,5 +1,6 @@
 #include "common/pac_common.h"
 #include "objects/pacman.h"
+#include "objects/map.h"
 
 int main(int argc, char *argv[]) {
     if (!app_init()) {
@@ -8,6 +9,8 @@ int main(int argc, char *argv[]) {
     }
     //Main loop flag
     bool quit = false;
+
+    Tile **tileSet = MAP_init();
 
     //Event handler
     SDL_Event e;
@@ -29,9 +32,12 @@ int main(int argc, char *argv[]) {
         SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
         SDL_RenderClear(gRenderer);
 
+        //Render map
+        MAP_render(tileSet);
+
         //Animate pacman
         PACMAN_action(&pacMan);
-        //move pacman
+        //Move pacman
         PACMAN_move(&pacMan);
         //Render pacman to window
         PACMAN_render(&pacMan);
@@ -39,7 +45,10 @@ int main(int argc, char *argv[]) {
         //Update screen
         SDL_RenderPresent(gRenderer);
     }
+
     PACMAN_terminate(&pacMan);
+    free(tileSet);
     app_close();
+
     return 0;
 }
