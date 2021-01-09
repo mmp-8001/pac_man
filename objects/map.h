@@ -20,4 +20,7 @@ extern Tile **MAP_init();
 //Extern map render to render map to window
 extern void MAP_render(Tile **tileSet);
 
+//Extern map touches to check if an object touch map's components
+extern bool MAP_touches(SDL_Rect box, Tile *tiles[]);
+
 #endif //PAC_MAN_MAP_H

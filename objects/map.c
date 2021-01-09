@@ -7,6 +7,8 @@
 //Prototype for this file functions
 void create_tile();
 
+bool check_collision(SDL_Rect a, SDL_Rect b);
+
 void tile_render(Tile *obj);
 
 //Global variable for this file
@@ -26,9 +28,9 @@ int map[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0,
              0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
              0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0,
-             0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+             0, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+             0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0,
+             0, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
              0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
              0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0,
@@ -120,4 +122,61 @@ void MAP_render(Tile **tileSet) {
 //this function render tile to window
 void tile_render(Tile *obj) {
     LTexture_render(&gTileTexture, obj->mBox.x, obj->mBox.y, &gTileClips[obj->mType], 0.0, NULL, SDL_FLIP_NONE);
+}
+
+//Checks collision box against box
+bool check_collision(SDL_Rect a, SDL_Rect b) {
+    //The sides of the rectangles
+    int leftA, leftB;
+    int rightA, rightB;
+    int topA, topB;
+    int bottomA, bottomB;
+
+    //Calculate the sides of rect A
+    leftA = a.x;
+    rightA = a.x + a.w;
+    topA = a.y;
+    bottomA = a.y + a.h;
+
+    //Calculate the sides of rect B
+    leftB = b.x;
+    rightB = b.x + b.w;
+    topB = b.y;
+    bottomB = b.y + b.h;
+    //If any of the sides from A are outside of B
+    if (bottomA < topB) {
+        return false;
+    }
+
+    if (topA > bottomB) {
+        return false;
+    }
+
+    if (rightA < leftB) {
+        return false;
+    }
+
+    if (leftA > rightB) {
+        return false;
+    }
+
+    //If none of the sides from A are outside B
+    return true;
+}
+
+//Checks collision box against set of tiles
+bool MAP_touches(SDL_Rect box, Tile *tiles[]) {
+    //Go through the tiles
+    for (int i = 0; i < TOTAL_TILES; ++i) {
+        //If the tile is a wall type tile
+        if (tiles[i]->mType == TILE_WALL) {
+            //If the collision box touches the wall tile
+            if (check_collision(box, tiles[i]->mBox)) {
+                return true;
+            }
+        }
+    }
+
+    //If no wall tiles were touched
+    return false;
 }

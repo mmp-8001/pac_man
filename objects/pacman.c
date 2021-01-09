@@ -8,12 +8,15 @@
 void create_status();
 
 //Const global variable for our pacman
-const int PACMAN_WIDTH = 30;
-const int PACMAN_HEIGHT = 30;
+const int PACMAN_WIDTH = 26;
+const int PACMAN_HEIGHT = 26;
 const int PACMAN_VEL = 1;
 const int WALKING_ANIMATION_FRAMES = 5;
 const int ANIMATION_DELAY = 8;
 char PACMAN_PIC[] = "../assets/pacman.png";
+enum PACMAN_MOVE {
+    PAC_UP, PAC_DOWN, PAC_RIGHT, PAC_LEFT
+};
 
 SDL_Rect PACMAN_SPRITE_CLIP[5];
 
@@ -23,28 +26,24 @@ void PACMAN_init(PACMAN *obj, int posX, int posY) {
     create_status();
     obj->status = 0;
     obj->angle = 0;
-    obj->pWidth = PACMAN_WIDTH;
-    obj->pHeight = PACMAN_HEIGHT;
+    obj->pMove = PAC_RIGHT;
     obj->pVelocity = PACMAN_VEL;
-    obj->pPosx = posX;
-    obj->pPosy = posY;
+    obj->pBox.x = posX;
+    obj->pBox.y = posY;
+    obj->pBox.w = PACMAN_WIDTH;
+    obj->pBox.h = PACMAN_HEIGHT;
     obj->pFlipType = SDL_FLIP_NONE;
     LTexture_loadFromFile(&obj->pTexture, PACMAN_PIC);
 }
 
 //This function terminate pacman
 void PACMAN_terminate(PACMAN *obj) {
-    obj->pWidth = 0;
-    obj->pHeight = 0;
-    obj->pVelocity = 0;
-    obj->pPosx = 0;
-    obj->pPosy = 0;
     LTexture_free(&obj->pTexture);
 }
 
 //This function render pacman to window
 void PACMAN_render(PACMAN *obj) {
-    LTexture_render(&obj->pTexture, obj->pPosx, obj->pPosy, &PACMAN_SPRITE_CLIP[obj->status], obj->angle, NULL,
+    LTexture_render(&obj->pTexture, obj->pBox.x, obj->pBox.y, &PACMAN_SPRITE_CLIP[obj->status], obj->angle, NULL,
                     obj->pFlipType);
 }
 
@@ -61,75 +60,100 @@ void PACMAN_action(PACMAN *obj) {
 }
 
 //This function handle pacman direction
-void PACMAN_handle(PACMAN *obj, SDL_Event e) {
+void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
+    int vel = 4;
     //Check if user press key down
     if (e.type == SDL_KEYDOWN) {
         //Get key which user press it and set direction of our pacman
         switch (e.key.keysym.sym) {
+            //If user press up key
             case SDLK_UP:
-                obj->angle = 270;
+                obj->pBox.y -= vel;
+                if (obj->pBox.y < 0 || !MAP_touches(obj->pBox, tileSet)) {
+                    obj->pMove = PAC_UP;
+                    obj->angle = 270;
+                }
+                obj->pBox.y += vel;
                 break;
 
+                //If user press down key
             case SDLK_DOWN:
-                obj->angle = 90;
+                obj->pBox.y += vel;
+                if (obj->pBox.y > SCREEN_HEIGHT || !MAP_touches(obj->pBox, tileSet)) {
+                    obj->pMove = PAC_DOWN;
+                    obj->angle = 90;
+                }
+                obj->pBox.y -= vel;
                 break;
 
+                //If user press right key
             case SDLK_RIGHT:
-                if (obj->angle == 180 || obj->angle == 270 || obj->angle == 90) {
-                    obj->pFlipType = SDL_FLIP_NONE;
+                obj->pBox.x += vel;
+                if (obj->pBox.x > SCREEN_WIDTH || !MAP_touches(obj->pBox, tileSet)) {
+                    obj->pMove = PAC_RIGHT;
+                    if (obj->angle == 180 || obj->angle == 270 || obj->angle == 90) {
+                        obj->pFlipType = SDL_FLIP_NONE;
+                    }
+                    obj->angle = 0;
                 }
-                obj->angle = 0;
+                obj->pBox.x -= vel;
                 break;
 
+                //IF user press left key
             case SDLK_LEFT:
-                if (obj->angle == 0 || obj->angle == 270 || obj->angle == 90) {
-                    obj->pFlipType = SDL_FLIP_VERTICAL;
+                obj->pBox.x -= vel;
+                if (obj->pBox.x < 0 || !MAP_touches(obj->pBox, tileSet)) {
+                    obj->pMove = PAC_LEFT;
+                    if (obj->angle == 0 || obj->angle == 270 || obj->angle == 90) {
+                        obj->pFlipType = SDL_FLIP_VERTICAL;
+                    }
+                    obj->angle = 180;
                 }
-                obj->angle = 180;
+                obj->pBox.x += vel;
                 break;
         }
     }
 }
 
 //This function move pacman according to it's direction
-void PACMAN_move(PACMAN *obj) {
+void PACMAN_move(PACMAN *obj, Tile **tileSet) {
     int vel = obj->pVelocity;
-    switch (obj->angle) {
-        //Pacman face to up
-        case 270:
-            obj->pPosy -= vel;
-            if (obj->pPosy <= -20) {
-                obj->pPosy = SCREEN_HEIGHT;
+    switch (obj->pMove) {
+        //If want to go up
+        case PAC_UP:
+            obj->pBox.y -= vel;
+            if (obj->pBox.y < 0 || MAP_touches(obj->pBox, tileSet)) {
+                obj->pBox.y += vel;
             }
             break;
 
-            //Pacman face to down
-        case 90:
-            obj->pPosy += vel;
-            if (obj->pPosy - 10 >= SCREEN_HEIGHT) {
-                obj->pPosy = -20;
+            //If want to go down
+        case PAC_DOWN:
+            obj->pBox.y += vel;
+            if (obj->pBox.y > SCREEN_HEIGHT || MAP_touches(obj->pBox, tileSet)) {
+                obj->pBox.y -= vel;
             }
             break;
 
-            //Pacman face to right
-        case 0:
-            obj->pPosx += vel;
-            if (obj->pPosx - 10 >= SCREEN_WIDTH) {
-                obj->pPosx = -20;
+            //If want to go right
+        case PAC_RIGHT:
+            obj->pBox.x += vel;
+            if (obj->pBox.x > SCREEN_WIDTH || MAP_touches(obj->pBox, tileSet)) {
+                obj->pBox.x -= vel;
             }
             break;
 
-            //Pacman face to left
-        case 180:
-            obj->pPosx -= vel;
-            if (obj->pPosx <= -20) {
-                obj->pPosx = SCREEN_WIDTH + 10;
+            //If want to go left
+        case PAC_LEFT:
+            obj->pBox.x -= vel;
+            if (obj->pBox.x < 0 || MAP_touches(obj->pBox, tileSet)) {
+                obj->pBox.x += vel;
             }
             break;
     }
 }
 
-//this function create different status of pacman
+//This function create different status of pacman
 void create_status() {
     //Status 0
     PACMAN_SPRITE_CLIP[0].x = 0;

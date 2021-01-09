@@ -7,18 +7,17 @@
 
 #include "SDL2/SDL.h"
 #include "../main/LTexture.h"
+#include "../objects/map.h"
 
 //Properties of pacman
 typedef struct {
     int status;
     int angle;
-    int pWidth;
-    int pHeight;
     int pVelocity;
-    int pPosx;
-    int pPosy;
-    SDL_RendererFlip pFlipType;
+    int pMove;
     LTexture pTexture;
+    SDL_Rect pBox;
+    SDL_RendererFlip pFlipType;
 } PACMAN;
 
 //Extern pacman initialization
@@ -34,9 +33,9 @@ extern void PACMAN_render(PACMAN *obj);
 extern void PACMAN_action(PACMAN *obj);
 
 //Extern pacman handle to handle direction of pacman
-extern void PACMAN_handle(PACMAN *obj, SDL_Event e);
+extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e);
 
 //Extern pacman move to move pacman according to it's direction
-extern void PACMAN_move(PACMAN *obj);
+extern void PACMAN_move(PACMAN *obj, Tile **tileSet);
 
 #endif //PAC_MAN_PACMAN_H
