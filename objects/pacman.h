@@ -32,7 +32,7 @@ extern void PACMAN_render(PACMAN *obj);
 //Extern action function to make pacman alive
 extern void PACMAN_action(PACMAN *obj);
 
-//Extern pacman handle to handle direction of pacman
+//Extern pacman handle to handle direction and next move of pacman
 extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e);
 
 //Extern pacman move to move pacman according to it's direction

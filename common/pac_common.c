@@ -17,6 +17,9 @@ SDL_Window *gWindow = NULL;
 //The window renderer
 SDL_Renderer *gRenderer = NULL;
 
+//Control app speed
+int APP_DELAY = 10;
+
 //This function check lib, init SDL and SDL_Image, create renderer and window
 bool app_init() {
     //Initialization flag

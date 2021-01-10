@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
     //Create pacman
     PACMAN pacMan;
-    PACMAN_init(&pacMan, 0, 32);
+    PACMAN_init(&pacMan, 0, 30);
 
     //Main loop, While application is running
     while (!quit) {
@@ -27,8 +27,14 @@ int main(int argc, char *argv[]) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
-            PACMAN_handle(&pacMan, tileSet, e);
         }
+
+        PACMAN_handle(&pacMan, tileSet, e);
+        //Animate pacman
+        PACMAN_action(&pacMan);
+        //Move pacman
+        PACMAN_move(&pacMan, tileSet);
+
         //Clear screen
         SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
         SDL_RenderClear(gRenderer);
@@ -36,12 +42,11 @@ int main(int argc, char *argv[]) {
         //Render map
         MAP_render(tileSet);
 
-        //Animate pacman
-        PACMAN_action(&pacMan);
-        //Move pacman
-        PACMAN_move(&pacMan, tileSet);
         //Render pacman to window
         PACMAN_render(&pacMan);
+
+        //Control speed of app
+        SDL_Delay(APP_DELAY);
 
         //Update screen
         SDL_RenderPresent(gRenderer);
