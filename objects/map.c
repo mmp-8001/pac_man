@@ -166,6 +166,17 @@ bool check_collision(SDL_Rect a, SDL_Rect b) {
 
 //Checks collision box against set of tiles
 bool MAP_touches(SDL_Rect box, Tile *tiles[]) {
+    int p_col, p_row;
+
+    //Get current position
+    p_col = (box.x + 15) / TILE_WIDTH;
+    p_row = (box.y + 15) / TILE_HEIGHT;
+
+    //If seed in current position eat that
+    if (tiles[p_row * 20 + p_col]->mType == 2) {
+        tiles[p_row * 20 + p_col]->mType = 1;
+    }
+
     //Go through the tiles
     for (int i = 0; i < TOTAL_TILES; ++i) {
         //If the tile is a wall type tile
@@ -176,7 +187,6 @@ bool MAP_touches(SDL_Rect box, Tile *tiles[]) {
             }
         }
     }
-
     //If no wall tiles were touched
     return false;
 }
