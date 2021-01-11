@@ -14,9 +14,9 @@
 extern const char gAppName[];
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
+extern const int APP_DELAY;
 extern SDL_Window *gWindow;
 extern SDL_Renderer *gRenderer;
-extern int APP_DELAY;
 
 //Extern app init to initialize our app
 extern bool app_init();

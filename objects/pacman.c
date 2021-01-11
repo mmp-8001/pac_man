@@ -5,28 +5,29 @@
 #include "pacman.h"
 
 //Prototype for this file functions
-void create_status();
+static void create_status();
 
-//Const global variable for our pacman
-const int PACMAN_WIDTH = 30;
-const int PACMAN_HEIGHT = 30;
-const int PACMAN_VEL = 1;
-const int WALKING_ANIMATION_FRAMES = 5;
-const int ANIMATION_DELAY = 5;
-const int PACMAN_NEXT_MOVE = 45;
-char PACMAN_PIC[] = "../assets/pacman.png";
+//Enum for pacman move
 enum PACMAN_MOVE {
     PAC_UP = SDLK_UP, PAC_DOWN = SDLK_DOWN, PAC_RIGHT = SDLK_RIGHT, PAC_LEFT = SDLK_LEFT
 };
 
-SDL_Rect PACMAN_SPRITE_CLIP[5];
+//Const global variable for our pacman
+static const int PACMAN_WIDTH = 30;
+static const int PACMAN_HEIGHT = 30;
+static const int PACMAN_VEL = 1;
+static const int WALKING_ANIMATION_FRAMES = 5;
+static const int ANIMATION_DELAY = 5;
+static const int PACMAN_NEXT_MOVE = 45;
+static char PACMAN_PIC[] = "../assets/pacman.png";
+static SDL_Rect PACMAN_SPRITE_CLIP[5];
 
 
 //This function create one pacman
-void PACMAN_init(PACMAN *obj, int posX, int posY) {
+extern void PACMAN_init(PACMAN *obj, int posX, int posY) {
     create_status();
-    obj->status = 0;
-    obj->angle = 0;
+    obj->pStatus = 0;
+    obj->pAngle = 0;
     obj->pMove = PAC_RIGHT;
     obj->pVelocity = PACMAN_VEL;
     obj->pBox.x = posX;
@@ -38,29 +39,29 @@ void PACMAN_init(PACMAN *obj, int posX, int posY) {
 }
 
 //This function terminate pacman
-void PACMAN_terminate(PACMAN *obj) {
+extern void PACMAN_terminate(PACMAN *obj) {
     LTexture_free(&obj->pTexture);
 }
 
 //This function render pacman to window
-void PACMAN_render(PACMAN *obj) {
-    LTexture_render(&obj->pTexture, obj->pBox.x, obj->pBox.y, &PACMAN_SPRITE_CLIP[obj->status], obj->angle, NULL,
+extern void PACMAN_render(PACMAN *obj) {
+    LTexture_render(&obj->pTexture, obj->pBox.x, obj->pBox.y, &PACMAN_SPRITE_CLIP[obj->pStatus], obj->pAngle, NULL,
                     obj->pFlipType);
 }
 
 //This function make pacman alive
-void PACMAN_action(PACMAN *obj) {
+extern void PACMAN_action(PACMAN *obj) {
     static int frame;
-    obj->status = frame / ANIMATION_DELAY;
+    obj->pStatus = frame / ANIMATION_DELAY;
     if (frame / ANIMATION_DELAY >= WALKING_ANIMATION_FRAMES) {
         frame = 0;
-        obj->status = 0;
+        obj->pStatus = 0;
     }
     frame++;
 }
 
 //This function handle pacman direction and next move
-void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
+extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
     static int time = 0, move;
 
     //Get pac man velocity
@@ -85,7 +86,7 @@ void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
             obj->pBox.y -= vel;
             if (obj->pBox.y < 0 || !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_UP;
-                obj->angle = 270;
+                obj->pAngle = 270;
             }
             obj->pBox.y += vel;
             break;
@@ -95,7 +96,7 @@ void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
             obj->pBox.y += vel;
             if (obj->pBox.y > SCREEN_HEIGHT || !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_DOWN;
-                obj->angle = 90;
+                obj->pAngle = 90;
             }
             obj->pBox.y -= vel;
             break;
@@ -105,10 +106,10 @@ void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
             obj->pBox.x += vel;
             if (obj->pBox.x > SCREEN_WIDTH || !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_RIGHT;
-                if (obj->angle == 180 || obj->angle == 270 || obj->angle == 90) {
+                if (obj->pAngle == 180 || obj->pAngle == 270 || obj->pAngle == 90) {
                     obj->pFlipType = SDL_FLIP_NONE;
                 }
-                obj->angle = 0;
+                obj->pAngle = 0;
             }
             obj->pBox.x -= vel;
             break;
@@ -118,10 +119,10 @@ void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
             obj->pBox.x -= vel;
             if (obj->pBox.x < 0 || !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_LEFT;
-                if (obj->angle == 0 || obj->angle == 270 || obj->angle == 90) {
+                if (obj->pAngle == 0 || obj->pAngle == 270 || obj->pAngle == 90) {
                     obj->pFlipType = SDL_FLIP_VERTICAL;
                 }
-                obj->angle = 180;
+                obj->pAngle = 180;
             }
             obj->pBox.x += vel;
             break;
@@ -130,7 +131,7 @@ void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
 }
 
 //This function move pacman according to it's direction
-void PACMAN_move(PACMAN *obj, Tile **tileSet) {
+extern void PACMAN_move(PACMAN *obj, Tile **tileSet) {
     int vel = obj->pVelocity;
     switch (obj->pMove) {
         //If want to go up
@@ -168,7 +169,7 @@ void PACMAN_move(PACMAN *obj, Tile **tileSet) {
 }
 
 //This function create different status of pacman
-void create_status() {
+static void create_status() {
     //Status 0
     PACMAN_SPRITE_CLIP[0].x = 0;
     PACMAN_SPRITE_CLIP[0].y = 0;

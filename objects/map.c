@@ -5,25 +5,25 @@
 #include "map.h"
 
 //Prototype for this file functions
-void create_tile();
+static void create_tile();
 
-bool check_collision(SDL_Rect a, SDL_Rect b);
+static bool check_collision(SDL_Rect a, SDL_Rect b);
 
-void tile_render(Tile *obj);
+static void tile_render(Tile *obj);
 
 //Global variable for this file
-int TILE_WIDTH = 30;
-int TILE_HEIGHT = 30;
-short int TILE_WALL = 0;
-short int TILE_TRANS = 1;
-short int TILE_SEED = 2;
-int TOTAL_TILES = 400;
-char TILES_PIC[] = "../assets/tiles.png";
-SDL_Rect gTileClips[3];
-LTexture gTileTexture;
+static int TILE_WIDTH = 30;
+static int TILE_HEIGHT = 30;
+static short int TILE_WALL = 0;
+static short int TILE_TRANS = 1;
+static short int TILE_SEED = 2;
+static int TOTAL_TILES = 400;
+static char TILES_PIC[] = "../assets/tiles.png";
+static SDL_Rect gTileClips[3];
+static LTexture gTileTexture;
 
 //Temporary map for testing
-int map[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+static int map[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
              0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0,
              0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
@@ -46,7 +46,7 @@ int map[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
 
 //This function initialize map
-Tile **MAP_init() {
+extern Tile **MAP_init() {
     //Calculate total tiles according to screen width and screen height
     int tile_type, x = 0, y = 0;
 
@@ -86,7 +86,7 @@ Tile **MAP_init() {
 }
 
 //This function Load tile texture and clip that texture to gain proper section
-void create_tile() {
+static void create_tile() {
     //Load tile texture
     if (!LTexture_loadFromFile(&gTileTexture, TILES_PIC)) {
         printf("Failed to load tile set texture!\n");
@@ -113,19 +113,19 @@ void create_tile() {
 }
 
 //This function render map to window
-void MAP_render(Tile **tileSet) {
+extern void MAP_render(Tile **tileSet) {
     for (int i = 0; i < TOTAL_TILES; ++i) {
         tile_render(tileSet[i]);
     }
 }
 
 //this function render tile to window
-void tile_render(Tile *obj) {
+static void tile_render(Tile *obj) {
     LTexture_render(&gTileTexture, obj->mBox.x, obj->mBox.y, &gTileClips[obj->mType], 0.0, NULL, SDL_FLIP_NONE);
 }
 
 //Checks collision box against box
-bool check_collision(SDL_Rect a, SDL_Rect b) {
+static bool check_collision(SDL_Rect a, SDL_Rect b) {
     //The sides of the rectangles
     int leftA, leftB;
     int rightA, rightB;
@@ -165,7 +165,7 @@ bool check_collision(SDL_Rect a, SDL_Rect b) {
 }
 
 //Checks collision box against set of tiles
-bool MAP_touches(SDL_Rect box, Tile *tiles[]) {
+extern bool MAP_touches(SDL_Rect box, Tile *tiles[]) {
     int p_col, p_row;
 
     //Get current position

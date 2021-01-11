@@ -11,17 +11,17 @@ const char gAppName[] = "PAC-MAN";
 const int SCREEN_WIDTH = 600;
 const int SCREEN_HEIGHT = 600;
 
+//Control app speed
+int const APP_DELAY = 10;
+
 //The window we'll be rendering to
 SDL_Window *gWindow = NULL;
 
 //The window renderer
 SDL_Renderer *gRenderer = NULL;
 
-//Control app speed
-int APP_DELAY = 10;
-
 //This function check lib, init SDL and SDL_Image, create renderer and window
-bool app_init() {
+extern bool app_init() {
     //Initialization flag
     bool success = true;
 
@@ -64,7 +64,7 @@ bool app_init() {
 }
 
 //This function close our application
-void app_close() {
+extern void app_close() {
     //Destroy window
     SDL_DestroyRenderer(gRenderer);
     SDL_DestroyWindow(gWindow);

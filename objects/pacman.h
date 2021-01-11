@@ -11,8 +11,8 @@
 
 //Properties of pacman
 typedef struct {
-    int status;
-    int angle;
+    int pStatus;
+    int pAngle;
     int pVelocity;
     int pMove;
     LTexture pTexture;

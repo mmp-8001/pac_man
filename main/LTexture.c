@@ -5,7 +5,7 @@
 #include "LTexture.h"
 
 //This function clear memory and deallocate
-void LTexture_free(LTexture *obj) {
+extern void LTexture_free(LTexture *obj) {
     //Free texture if it exists
     if (obj->mTexture != NULL) {
         SDL_DestroyTexture(obj->mTexture);
@@ -16,7 +16,7 @@ void LTexture_free(LTexture *obj) {
 }
 
 //This function load surface from specified file
-bool LTexture_loadFromFile(LTexture *obj, char *path) {
+extern bool LTexture_loadFromFile(LTexture *obj, char *path) {
     //Free up if we have data in that chunk of memory
     LTexture_free(obj);
 
@@ -51,7 +51,7 @@ bool LTexture_loadFromFile(LTexture *obj, char *path) {
 
 //This function render our loaded surface to window
 void
-LTexture_render(LTexture *obj, int x, int y, SDL_Rect *clip, double angle, SDL_Point *center, SDL_RendererFlip flip) {
+extern LTexture_render(LTexture *obj, int x, int y, SDL_Rect *clip, double angle, SDL_Point *center, SDL_RendererFlip flip) {
     //Set rendering space and render to screen
     SDL_Rect renderQuad = {x, y, obj->mWidth, obj->mHeight};
 
