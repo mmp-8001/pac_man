@@ -19,6 +19,7 @@ static const int PACMAN_VEL = 1;
 static const int WALKING_ANIMATION_FRAMES = 5;
 static const int ANIMATION_DELAY = 5;
 static const int PACMAN_NEXT_MOVE = 45;
+static const int PACMAN_SOFT = 5;
 static char PACMAN_PIC[] = "../assets/pacman.png";
 static SDL_Rect PACMAN_SPRITE_CLIP[5];
 
@@ -83,47 +84,157 @@ extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
     switch (move) {
         //If user press up key
         case PAC_UP:
+            //Go up to check we have collision or not
             obj->pBox.y -= vel;
+
+            //Check we have collision or not
             if (obj->pBox.y < 0 || !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_UP;
                 obj->pAngle = 270;
+            } else {
+                //If we have collision we want to make pacman soft and we accept changing direction with some laps
+                if (obj->pMove == PAC_LEFT) {
+                    obj->pBox.x += PACMAN_SOFT;
+                }
+                if (obj->pMove == PAC_RIGHT) {
+                    obj->pBox.x -= PACMAN_SOFT;
+                }
+
+                //If we have collision again we should place pacman in last position
+                if (obj->pBox.y < 0 || !MAP_touches(obj->pBox, tileSet)) {
+                    obj->pMove = PAC_UP;
+                    obj->pAngle = 270;
+                } else {
+                    if (obj->pMove == PAC_LEFT) {
+                        obj->pBox.x -= PACMAN_SOFT;
+                    }
+                    if (obj->pMove == PAC_RIGHT) {
+                        obj->pBox.x += PACMAN_SOFT;
+                    }
+                }
             }
+
+            //After check collision go down to place pacman in last position
             obj->pBox.y += vel;
             break;
 
             //If user press down key
         case PAC_DOWN:
+            //Go down to check we have collision or not
             obj->pBox.y += vel;
+
+            //Check we have collision or not
             if (obj->pBox.y > SCREEN_HEIGHT || !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_DOWN;
                 obj->pAngle = 90;
+            } else {
+                //If we have collision we want to make pacman soft and we accept changing direction with some laps
+                if (obj->pMove == PAC_LEFT) {
+                    obj->pBox.x += PACMAN_SOFT;
+                }
+                if (obj->pMove == PAC_RIGHT) {
+                    obj->pBox.x -= PACMAN_SOFT;
+                }
+
+                //If we have collision again we should place pacman in last position
+                if (obj->pBox.y > SCREEN_HEIGHT || !MAP_touches(obj->pBox, tileSet)) {
+                    obj->pMove = PAC_DOWN;
+                    obj->pAngle = 90;
+                } else {
+                    if (obj->pMove == PAC_LEFT) {
+                        obj->pBox.x -= PACMAN_SOFT;
+                    }
+                    if (obj->pMove == PAC_RIGHT) {
+                        obj->pBox.x += PACMAN_SOFT;
+                    }
+                }
             }
+
+            //After check collision go up to place pacman in last position
             obj->pBox.y -= vel;
             break;
 
             //If user press right key
         case PAC_RIGHT:
+            //Go right to check we have collision or not
             obj->pBox.x += vel;
+
+            //Check we have collision or not
             if (obj->pBox.x > SCREEN_WIDTH || !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_RIGHT;
                 if (obj->pAngle == 180 || obj->pAngle == 270 || obj->pAngle == 90) {
                     obj->pFlipType = SDL_FLIP_NONE;
                 }
                 obj->pAngle = 0;
+            } else {
+                //If we have collision we want to make pacman soft and we accept changing direction with some laps
+                if (obj->pMove == PAC_UP) {
+                    obj->pBox.y += PACMAN_SOFT;
+                }
+                if (obj->pMove == PAC_DOWN) {
+                    obj->pBox.y -= PACMAN_SOFT;
+                }
+
+                //If we have collision again we should place pacman in last position
+                if (obj->pBox.x > SCREEN_WIDTH || !MAP_touches(obj->pBox, tileSet)) {
+                    obj->pMove = PAC_RIGHT;
+                    if (obj->pAngle == 180 || obj->pAngle == 270 || obj->pAngle == 90) {
+                        obj->pFlipType = SDL_FLIP_NONE;
+                    }
+                    obj->pAngle = 0;
+                } else {
+                    if (obj->pMove == PAC_UP) {
+                        obj->pBox.y -= PACMAN_SOFT;
+                    }
+                    if (obj->pMove == PAC_DOWN) {
+                        obj->pBox.y += PACMAN_SOFT;
+                    }
+                }
             }
+
+            //After check collision go left to place pacman in last position
             obj->pBox.x -= vel;
             break;
 
             //IF user press left key
         case PAC_LEFT:
+            //Go left to check we have collision or not
             obj->pBox.x -= vel;
+
+            //Check we have collision or not
             if (obj->pBox.x < 0 || !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_LEFT;
                 if (obj->pAngle == 0 || obj->pAngle == 270 || obj->pAngle == 90) {
                     obj->pFlipType = SDL_FLIP_VERTICAL;
                 }
                 obj->pAngle = 180;
+            } else {
+                //If we have collision we want to make pacman soft and we accept changing direction with some laps
+                if (obj->pMove == PAC_UP) {
+                    obj->pBox.y += PACMAN_SOFT;
+                }
+                if (obj->pMove == PAC_DOWN) {
+                    obj->pBox.y -= PACMAN_SOFT;
+                }
+
+                //If we have collision again we should place pacman in last position
+                if (obj->pBox.x < 0 || !MAP_touches(obj->pBox, tileSet)) {
+                    obj->pMove = PAC_LEFT;
+                    if (obj->pAngle == 0 || obj->pAngle == 270 || obj->pAngle == 90) {
+                        obj->pFlipType = SDL_FLIP_VERTICAL;
+                    }
+                    obj->pAngle = 180;
+                } else {
+                    if (obj->pMove == PAC_UP) {
+                        obj->pBox.y -= PACMAN_SOFT;
+                    }
+                    if (obj->pMove == PAC_DOWN) {
+                        obj->pBox.y += PACMAN_SOFT;
+                    }
+                }
             }
+
+            //After check collision go right to place pacman in last position
             obj->pBox.x += vel;
             break;
     }
@@ -136,6 +247,7 @@ extern void PACMAN_move(PACMAN *obj, Tile **tileSet) {
     switch (obj->pMove) {
         //If want to go up
         case PAC_UP:
+            //Go up and then check if we have collision place pacman in last position
             obj->pBox.y -= vel;
             if (obj->pBox.y < 0 || MAP_touches(obj->pBox, tileSet)) {
                 obj->pBox.y += vel;
@@ -144,22 +256,25 @@ extern void PACMAN_move(PACMAN *obj, Tile **tileSet) {
 
             //If want to go down
         case PAC_DOWN:
+            //Go down and then check if we have collision place pacman in last position
             obj->pBox.y += vel;
-            if (obj->pBox.y > SCREEN_HEIGHT || MAP_touches(obj->pBox, tileSet)) {
+            if (obj->pBox.y + obj->pBox.h > SCREEN_HEIGHT || MAP_touches(obj->pBox, tileSet)) {
                 obj->pBox.y -= vel;
             }
             break;
 
             //If want to go right
         case PAC_RIGHT:
+            //Go right and then check if we have collision place pacman in last position
             obj->pBox.x += vel;
-            if (obj->pBox.x > SCREEN_WIDTH || MAP_touches(obj->pBox, tileSet)) {
+            if (obj->pBox.x + obj->pBox.w > SCREEN_WIDTH || MAP_touches(obj->pBox, tileSet)) {
                 obj->pBox.x -= vel;
             }
             break;
 
             //If want to go left
         case PAC_LEFT:
+            //Go left and then check if we have collision place pacman in last position
             obj->pBox.x -= vel;
             if (obj->pBox.x < 0 || MAP_touches(obj->pBox, tileSet)) {
                 obj->pBox.x += vel;
