@@ -62,7 +62,7 @@ extern void PACMAN_action(PACMAN *obj) {
 }
 
 //This function handle pacman direction and next move
-extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
+extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
     static int time = 0, move;
 
     //Get pac man velocity
@@ -88,7 +88,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
             obj->pBox.y -= vel;
 
             //Check we have collision or not
-            if (obj->pBox.y < 0 || !MAP_touches(obj->pBox, tileSet)) {
+            if (!(obj->pBox.y < 0) && !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_UP;
                 obj->pAngle = 270;
             } else {
@@ -101,7 +101,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
                 }
 
                 //If we have collision again we should place pacman in last position
-                if (obj->pBox.y < 0 || !MAP_touches(obj->pBox, tileSet)) {
+                if (!(obj->pBox.y < 0) && !MAP_touches(obj->pBox, tileSet)) {
                     obj->pMove = PAC_UP;
                     obj->pAngle = 270;
                 } else {
@@ -124,7 +124,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
             obj->pBox.y += vel;
 
             //Check we have collision or not
-            if (obj->pBox.y > SCREEN_HEIGHT || !MAP_touches(obj->pBox, tileSet)) {
+            if (!(obj->pBox.y + obj->pBox.h > SCREEN_HEIGHT) && !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_DOWN;
                 obj->pAngle = 90;
             } else {
@@ -137,7 +137,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
                 }
 
                 //If we have collision again we should place pacman in last position
-                if (obj->pBox.y > SCREEN_HEIGHT || !MAP_touches(obj->pBox, tileSet)) {
+                if (!(obj->pBox.y + obj->pBox.h > SCREEN_HEIGHT) && !MAP_touches(obj->pBox, tileSet)) {
                     obj->pMove = PAC_DOWN;
                     obj->pAngle = 90;
                 } else {
@@ -160,7 +160,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
             obj->pBox.x += vel;
 
             //Check we have collision or not
-            if (obj->pBox.x > SCREEN_WIDTH || !MAP_touches(obj->pBox, tileSet)) {
+            if (!(obj->pBox.x + obj->pBox.w > SCREEN_WIDTH) && !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_RIGHT;
                 if (obj->pAngle == 180 || obj->pAngle == 270 || obj->pAngle == 90) {
                     obj->pFlipType = SDL_FLIP_NONE;
@@ -176,7 +176,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
                 }
 
                 //If we have collision again we should place pacman in last position
-                if (obj->pBox.x > SCREEN_WIDTH || !MAP_touches(obj->pBox, tileSet)) {
+                if (!(obj->pBox.x + obj->pBox.w > SCREEN_WIDTH) && !MAP_touches(obj->pBox, tileSet)) {
                     obj->pMove = PAC_RIGHT;
                     if (obj->pAngle == 180 || obj->pAngle == 270 || obj->pAngle == 90) {
                         obj->pFlipType = SDL_FLIP_NONE;
@@ -202,7 +202,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
             obj->pBox.x -= vel;
 
             //Check we have collision or not
-            if (obj->pBox.x < 0 || !MAP_touches(obj->pBox, tileSet)) {
+            if (!(obj->pBox.x < 0) && !MAP_touches(obj->pBox, tileSet)) {
                 obj->pMove = PAC_LEFT;
                 if (obj->pAngle == 0 || obj->pAngle == 270 || obj->pAngle == 90) {
                     obj->pFlipType = SDL_FLIP_VERTICAL;
@@ -218,7 +218,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
                 }
 
                 //If we have collision again we should place pacman in last position
-                if (obj->pBox.x < 0 || !MAP_touches(obj->pBox, tileSet)) {
+                if (!(obj->pBox.x < 0) && !MAP_touches(obj->pBox, tileSet)) {
                     obj->pMove = PAC_LEFT;
                     if (obj->pAngle == 0 || obj->pAngle == 270 || obj->pAngle == 90) {
                         obj->pFlipType = SDL_FLIP_VERTICAL;
@@ -242,7 +242,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e) {
 }
 
 //This function move pacman according to it's direction
-extern void PACMAN_move(PACMAN *obj, Tile **tileSet) {
+extern void PACMAN_move(PACMAN *obj, Tile ***tileSet) {
     int vel = obj->pVelocity;
     switch (obj->pMove) {
         //If want to go up

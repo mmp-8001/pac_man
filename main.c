@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     bool pause = false;
 
     //Create map
-    Tile **tileSet = MAP_init();
+    Tile ***tileSet = MAP_init();
 
     //Event handler
     SDL_Event e;

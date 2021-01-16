@@ -13,48 +13,56 @@ static void tile_render(Tile *obj);
 
 static void load_audio();
 
+static void get_tile_type(Tile *tile, int row, int col);
+
+bool is_wall(Tile *tile);
+
 //Global variable for this file
 static int TILE_WIDTH = 30;
 static int TILE_HEIGHT = 30;
-static short int TILE_WALL = 0;
-static short int TILE_TRANS = 1;
-static short int TILE_SEED = 2;
-static int TOTAL_TILES = 400;
+static int MAP_COL = 20;
+static int MAP_ROW = 20;
 static char TILES_PIC[] = "../assets/tiles.png";
-static SDL_Rect gTileClips[3];
+static SDL_Rect gTileClips[8];
 static LTexture gTileTexture;
 static Mix_Chunk *gPacmanMunch = NULL;
 
 //Temporary map for testing
-static int map[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-                    0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0,
-                    0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-                    0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-                    0, 0, 2, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0,
-                    0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-                    0, 2, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0,
-                    0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-                    0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-                    0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0,
-                    0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-                    0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-                    0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0,
-                    0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0,
+static int map[][20] = {
+        {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
+        {1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 2, 2, 2, 1, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0},
+        {0, 0, 2, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 1},
+        {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+        {0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 1, 2, 2, 2, 2, 2, 2, 2, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 1},
+        {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 1},
+        {1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
+        {1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 1},
+        {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
+        {1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
+        {1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
 //This function initialize map
-extern Tile **MAP_init() {
-    //Calculate total tiles according to screen width and screen height
+extern Tile ***MAP_init() {
+    //Initialization and declaration
     int tile_type, x = 0, y = 0;
 
-    //Allocate proper pointers, effectively an array
-    Tile **tileSet = malloc(TOTAL_TILES * sizeof(struct Tile *));
+    //Allocate array of map
+    Tile ***tileSet = malloc(MAP_ROW * sizeof(struct Tile **));
+
+    //Allocate and put one row in allocated map
+    for (int i = 0; i < MAP_ROW; ++i) {
+        tileSet[i] = malloc(MAP_ROW * sizeof(struct Tile *));
+    }
 
     //If memory allocated wasn't successful
     if (tileSet == NULL) {
@@ -63,32 +71,79 @@ extern Tile **MAP_init() {
     }
 
     //Initialize tiles value
-    for (int i = 0; i < TOTAL_TILES; ++i) {
-        tile_type = map[i];
-        tileSet[i] = malloc(sizeof(Tile));
-        tileSet[i]->mType = tile_type;
-        tileSet[i]->mBox.x = x;
-        tileSet[i]->mBox.y = y;
-        tileSet[i]->mBox.w = TILE_WIDTH;
-        tileSet[i]->mBox.h = TILE_HEIGHT;
-        x += TILE_WIDTH;
-
-        //If we've gone too far
-        if (x >= SCREEN_WIDTH) {
-            //Move back
-            x = 0;
-
-            //Move to the next row
-            y += TILE_HEIGHT;
+    for (int i = 0; i < MAP_ROW; ++i) {
+        for (int j = 0; j < MAP_COL; ++j) {
+            tileSet[i][j] = malloc(sizeof(Tile));
+            tileSet[i][j]->mAngle = 0;
+            get_tile_type(tileSet[i][j], i, j);
+            tileSet[i][j]->mBox.x = x;
+            tileSet[i][j]->mBox.y = y;
+            tileSet[i][j]->mBox.w = TILE_WIDTH;
+            tileSet[i][j]->mBox.h = TILE_HEIGHT;
+            x += TILE_WIDTH;
         }
+        //Move to the next row
+        y += TILE_HEIGHT;
+        x = 0;
     }
 
     //Load map's audio
     load_audio();
-    
+
     //Load tiles pic and proper clip array
     create_tile();
     return tileSet;
+}
+
+//This function find proper tile type and it's angle according to wall in map
+static void get_tile_type(Tile *tile, int row, int col) {
+    //1 mean we have wall and 2 walkable tile and we suppose we have wall around map
+    short int up = 1, down = 1, right = 1, left = 1, angle;
+
+    //If we have walkable tile or seed tile so we can choose them without any further effort
+    if (map[row][col] == TILE_TRANS || map[row][col] == TILE_SEED) {
+        if (map[row][col] == TILE_TRANS) {
+            tile->mType = TILE_TRANS;
+            return;
+        }
+        tile->mType = TILE_SEED;
+        return;
+    }
+    //So if we deal with wall find it's up and right and down and left tile
+    up = (0 <= row - 1 && map[row - 1][col] != 0) ? 2 : 1;
+    right = (col + 1 < MAP_COL && map[row][col + 1] != 0) ? 2 : 1;
+    down = (row + 1 < MAP_ROW && map[row + 1][col] != 0) ? 2 : 1;
+    left = (0 <= col - 1 && map[row][col - 1] != 0) ? 2 : 1;
+
+    //3 wall and 1 not wall
+    if (up * right * down * left == 2) {
+        tile->mType = TILE_WALL_LINE;
+        if (up == 2) tile->mAngle = 0;
+        else if (right == 2) tile->mAngle = 90;
+        else if (down == 2) tile->mAngle = 180;
+        else tile->mAngle = 270;
+    } else if (up * right * down * left == 8) {//1 wall and 3 not wall
+        tile->mType = TILE_WALL_ROUND;
+        if (left == 1) tile->mAngle = 0;
+        else if (up == 1) tile->mAngle = 90;
+        else if (right == 1) tile->mAngle = 180;
+        else tile->mAngle = 270;
+    } else if (up * right * down * left == 16) {//0 wall
+        tile->mType = TILE_WALL_CUBE;
+    } else if (up * right * down * left == 1) {//4 wall
+        tile->mType = TILE_WALL_EMPTY;
+    } else {
+        tile->mType = TILE_WALL_CORNER;
+        if (up == 2 && right == 2) tile->mAngle = 0;
+        else if (right == 2 && down == 2) tile->mAngle = 90;
+        else if (down == 2 && left == 2) tile->mAngle = 180;
+        else if (left == 2 && up == 2) tile->mAngle = 270;
+        else {
+            tile->mType = TILE_WALL_PARALLEL;
+            if (up == 2 && down == 2) tile->mAngle = 0;
+            else tile->mAngle = 90;
+        }
+    }
 }
 
 //This function Load tile texture and clip that texture to gain proper section
@@ -99,11 +154,11 @@ static void create_tile() {
         exit(0);
     }
 
-    //Specified wall section in pic
-    gTileClips[TILE_WALL].x = 0;
-    gTileClips[TILE_WALL].y = 0;
-    gTileClips[TILE_WALL].w = TILE_WIDTH;
-    gTileClips[TILE_WALL].h = TILE_HEIGHT;
+    //Specified transparent section in pic
+    gTileClips[TILE_TRANS].x = 0;
+    gTileClips[TILE_TRANS].y = 0;
+    gTileClips[TILE_TRANS].w = TILE_WIDTH;
+    gTileClips[TILE_TRANS].h = TILE_HEIGHT;
 
     //Specified seed section in pic
     gTileClips[TILE_SEED].x = 30;
@@ -111,23 +166,58 @@ static void create_tile() {
     gTileClips[TILE_SEED].w = TILE_WIDTH;
     gTileClips[TILE_SEED].h = TILE_HEIGHT;
 
-    //Specified transparent section in pic
-    gTileClips[TILE_TRANS].x = 60;
-    gTileClips[TILE_TRANS].y = 0;
-    gTileClips[TILE_TRANS].w = TILE_WIDTH;
-    gTileClips[TILE_TRANS].h = TILE_HEIGHT;
+    //Specified empty wall section in pic
+    gTileClips[TILE_WALL_EMPTY].x = 60;
+    gTileClips[TILE_WALL_EMPTY].y = 0;
+    gTileClips[TILE_WALL_EMPTY].w = TILE_WIDTH;
+    gTileClips[TILE_WALL_EMPTY].h = TILE_HEIGHT;
+
+    //Specified cube wall section in pic
+    gTileClips[TILE_WALL_CUBE].x = 90;
+    gTileClips[TILE_WALL_CUBE].y = 0;
+    gTileClips[TILE_WALL_CUBE].w = TILE_WIDTH;
+    gTileClips[TILE_WALL_CUBE].h = TILE_HEIGHT;
+
+    //Specified corner wall section in pic
+    gTileClips[TILE_WALL_CORNER].x = 120;
+    gTileClips[TILE_WALL_CORNER].y = 0;
+    gTileClips[TILE_WALL_CORNER].w = TILE_WIDTH;
+    gTileClips[TILE_WALL_CORNER].h = TILE_HEIGHT;
+
+    //Specified round wall section in pic
+    gTileClips[TILE_WALL_ROUND].x = 150;
+    gTileClips[TILE_WALL_ROUND].y = 0;
+    gTileClips[TILE_WALL_ROUND].w = TILE_WIDTH + 2;
+    gTileClips[TILE_WALL_ROUND].h = TILE_HEIGHT;
+
+    //Specified two parallel line wall section in pic
+    gTileClips[TILE_WALL_PARALLEL].x = 182;
+    gTileClips[TILE_WALL_PARALLEL].y = 0;
+    gTileClips[TILE_WALL_PARALLEL].w = TILE_WIDTH + 2;
+    gTileClips[TILE_WALL_PARALLEL].h = TILE_HEIGHT;
+
+    //Specified one line wall section in pic
+    gTileClips[TILE_WALL_LINE].x = 214;
+    gTileClips[TILE_WALL_LINE].y = 0;
+    gTileClips[TILE_WALL_LINE].w = TILE_WIDTH + 2;
+    gTileClips[TILE_WALL_LINE].h = TILE_HEIGHT;
 }
 
 //This function render map to window
-extern void MAP_render(Tile **tileSet) {
-    for (int i = 0; i < TOTAL_TILES; ++i) {
-        tile_render(tileSet[i]);
+extern void MAP_render(Tile ***tileSet) {
+    for (int i = 0; i < MAP_ROW; ++i) {
+        for (int j = 0; j < MAP_COL; ++j) {
+            tile_render(tileSet[i][j]);
+        }
     }
 }
 
 //This function render tile to window
 static void tile_render(Tile *obj) {
-    LTexture_render(&gTileTexture, obj->mBox.x, obj->mBox.y, &gTileClips[obj->mType], 0.0, NULL, SDL_FLIP_NONE);
+    short int x = 0;
+    if (obj->mType == TILE_WALL_PARALLEL || obj->mType == TILE_WALL_LINE || obj->mType == TILE_WALL_ROUND)x = 1;
+    LTexture_render(&gTileTexture, obj->mBox.x - x, obj->mBox.y, &gTileClips[obj->mType], obj->mAngle, NULL,
+                    SDL_FLIP_NONE);
 }
 
 //Checks collision box against box
@@ -171,25 +261,39 @@ static bool check_collision(SDL_Rect a, SDL_Rect b) {
 }
 
 //Checks collision box against set of tiles
-extern bool MAP_touches(SDL_Rect box, Tile *tiles[]) {
+extern bool MAP_touches(SDL_Rect box, Tile ***tiles) {
     int p_col, p_row;
-
+    Tile *sides[8];
     //Get current position
     p_col = (box.x + 15) / TILE_WIDTH;
     p_row = (box.y + 15) / TILE_HEIGHT;
 
-    //If seed in current position eat that
-    if (tiles[p_row * 20 + p_col]->mType == 2) {
-        Mix_PlayChannel(-1, gPacmanMunch, 0);
-        tiles[p_row * 20 + p_col]->mType = 1;
+    //Get tiles around current tile
+    sides[0] = (0 <= p_col - 1) ? tiles[p_row][p_col - 1] : NULL;
+    sides[1] = (p_col + 1 < MAP_COL) ? tiles[p_row][p_col + 1] : NULL;
+    if (0 <= p_row - 1) {
+        sides[2] = tiles[p_row - 1][p_col];
+        sides[3] = (0 <= p_col - 1) ? tiles[p_row - 1][p_col - 1] : NULL;
+        sides[4] = (p_col + 1 < MAP_COL) ? tiles[p_row - 1][p_col + 1] : NULL;
+    }
+    if (p_row + 1 < MAP_ROW) {
+        sides[5] = tiles[p_row + 1][p_col];
+        sides[6] = (0 <= p_col - 1) ? tiles[p_row + 1][p_col - 1] : NULL;
+        sides[7] = (p_col + 1 < MAP_COL) ? tiles[p_row + 1][p_col + 1] : NULL;
     }
 
-    //Go through the tiles
-    for (int i = 0; i < TOTAL_TILES; ++i) {
-        //If the tile is a wall type tile
-        if (tiles[i]->mType == TILE_WALL) {
+    //If seed in current position eat that
+    if (tiles[p_row][p_col]->mType == 2) {
+        Mix_PlayChannel(-1, gPacmanMunch, 0);
+        tiles[p_row][p_col]->mType = 1;
+    }
+
+    //Go through the side tiles
+    for (int i = 0; i < 8; ++i) {
+        //If we have tile and that tile is wall so check for collision
+        if (sides[i] != NULL && (is_wall(sides[i]))) {
             //If the collision box touches the wall tile
-            if (check_collision(box, tiles[i]->mBox)) {
+            if (check_collision(box, sides[i]->mBox)) {
                 return true;
             }
         }
@@ -198,7 +302,7 @@ extern bool MAP_touches(SDL_Rect box, Tile *tiles[]) {
     return false;
 }
 
-
+//This function load audio in map
 static void load_audio() {
     //Load audio
     gPacmanMunch = Mix_LoadWAV("../assets/munch.wav");
@@ -206,4 +310,16 @@ static void load_audio() {
         printf("Failed to load munch audio! SDL_mixer Error: %s\n", Mix_GetError());
         exit(1);
     }
+}
+
+//This function check if tile is wall one
+bool is_wall(Tile *tile) {
+    if (tile->mType == TILE_WALL_PARALLEL
+        || tile->mType == TILE_WALL_ROUND
+        || tile->mType == TILE_WALL_CUBE
+        || tile->mType == TILE_WALL_LINE
+        || tile->mType == TILE_WALL_CORNER
+        || tile->mType == TILE_WALL_EMPTY)
+        return true;
+    return false;
 }

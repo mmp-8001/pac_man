@@ -33,9 +33,9 @@ extern void PACMAN_render(PACMAN *obj);
 extern void PACMAN_action(PACMAN *obj);
 
 //Extern pacman handle to handle direction and next move of pacman
-extern void PACMAN_handle(PACMAN *obj, Tile **tileSet, SDL_Event e);
+extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e);
 
 //Extern pacman move to move pacman according to it's direction
-extern void PACMAN_move(PACMAN *obj, Tile **tileSet);
+extern void PACMAN_move(PACMAN *obj, Tile ***tileSet);
 
 #endif //PAC_MAN_PACMAN_H
