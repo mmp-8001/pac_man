@@ -80,4 +80,5 @@ extern void app_close() {
     //Quit SDL subsystems
     IMG_Quit();
     SDL_Quit();
+    Mix_Quit();
 }

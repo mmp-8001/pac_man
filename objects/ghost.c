@@ -35,6 +35,7 @@ extern void GHOST_init(GHOST *obj, int posX, int posY, char name[]) {
 //This function terminate ghost
 extern void GHOST_terminate(GHOST *obj) {
     LTexture_free(&obj->gTexture);
+    obj = NULL;
 }
 
 //This function render ghost to window

@@ -35,4 +35,6 @@ extern void MAP_render(Tile ***tileSet);
 //Extern map touches to check if an object touch map's components
 extern bool MAP_touches(SDL_Rect box, Tile ***tiles);
 
+extern void MAP_terminate(Tile ***tileSet);
+
 #endif //PAC_MAN_MAP_H

@@ -27,42 +27,13 @@ static SDL_Rect gTileClips[8];
 static LTexture gTileTexture;
 static Mix_Chunk *gPacmanMunch = NULL;
 
-//Temporary map for testing
-static int map[][20] = {
-        {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
-        {1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 2, 2, 2, 1, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0},
-        {0, 0, 2, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 1},
-        {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
-        {0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 1, 2, 2, 2, 2, 2, 2, 2, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 1},
-        {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 1},
-        {1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
-        {1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 1},
-        {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
-        {1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
-        {1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-};
-
 //This function initialize map
 extern Tile ***MAP_init() {
     //Initialization and declaration
-    int tile_type, x = 0, y = 0;
+    int x = 0, y = 0;
 
     //Allocate array of map
     Tile ***tileSet = malloc(MAP_ROW * sizeof(struct Tile **));
-
-    //Allocate and put one row in allocated map
-    for (int i = 0; i < MAP_ROW; ++i) {
-        tileSet[i] = malloc(MAP_ROW * sizeof(struct Tile *));
-    }
 
     //If memory allocated wasn't successful
     if (tileSet == NULL) {
@@ -70,10 +41,23 @@ extern Tile ***MAP_init() {
         exit(1);
     }
 
+    //Allocate and put one row in allocated map
+    for (int i = 0; i < MAP_ROW; ++i) {
+        tileSet[i] = malloc(MAP_ROW * sizeof(struct Tile *));
+        if (tileSet[i] == NULL) {
+            printf("Memory not allocated.\n");
+            exit(1);
+        }
+    }
+
     //Initialize tiles value
     for (int i = 0; i < MAP_ROW; ++i) {
         for (int j = 0; j < MAP_COL; ++j) {
             tileSet[i][j] = malloc(sizeof(Tile));
+            if (tileSet[i][j] == NULL) {
+                printf("Memory not allocated.\n");
+                exit(1);
+            }
             tileSet[i][j]->mAngle = 0;
             get_tile_type(tileSet[i][j], i, j);
             tileSet[i][j]->mBox.x = x;
@@ -97,8 +81,31 @@ extern Tile ***MAP_init() {
 
 //This function find proper tile type and it's angle according to wall in map
 static void get_tile_type(Tile *tile, int row, int col) {
+    unsigned short int map[20][20] = {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0},
+            {0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0},
+            {0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0},
+            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0},
+            {0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0},
+            {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0},
+            {0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0},
+            {0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0},
+            {0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+    };
+
     //1 mean we have wall and 2 walkable tile and we suppose we have wall around map
-    short int up = 1, down = 1, right = 1, left = 1, angle;
+    short int up = 1, down = 1, right = 1, left = 1;
 
     //If we have walkable tile or seed tile so we can choose them without any further effort
     if (map[row][col] == TILE_TRANS || map[row][col] == TILE_SEED) {
@@ -263,7 +270,7 @@ static bool check_collision(SDL_Rect a, SDL_Rect b) {
 //Checks collision box against set of tiles
 extern bool MAP_touches(SDL_Rect box, Tile ***tiles) {
     int p_col, p_row;
-    Tile *sides[8];
+    Tile *sides[8] = {NULL};
     //Get current position
     p_col = (box.x + 15) / TILE_WIDTH;
     p_row = (box.y + 15) / TILE_HEIGHT;
@@ -322,4 +329,16 @@ bool is_wall(Tile *tile) {
         || tile->mType == TILE_WALL_EMPTY)
         return true;
     return false;
+}
+
+//This function destroy all in map
+extern void MAP_terminate(Tile ***tileSet) {
+    //Free tiles if it exists
+    free(tileSet);
+
+    //Free tile texture
+    LTexture_free(&gTileTexture);
+    gTileTexture.mTexture = NULL;
+    Mix_FreeChunk(gPacmanMunch);
+    gPacmanMunch = NULL;
 }

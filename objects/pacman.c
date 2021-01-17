@@ -42,6 +42,7 @@ extern void PACMAN_init(PACMAN *obj, int posX, int posY) {
 //This function terminate pacman
 extern void PACMAN_terminate(PACMAN *obj) {
     LTexture_free(&obj->pTexture);
+    obj = NULL;
 }
 
 //This function render pacman to window

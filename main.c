@@ -21,8 +21,9 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
     //Create pacman
     PACMAN pacMan;
-    PACMAN_init(&pacMan, 0, 30);
+    PACMAN_init(&pacMan, 30, 30);
 
+    //Create ghosts
     GHOST pinky;
     GHOST_init(&pinky, 0, 30, "PINKY");
 
@@ -69,9 +70,10 @@ int main(int argc, char *argv[]) {
         SDL_RenderPresent(gRenderer);
     }
 
+    //Destroy all objects in app
     PACMAN_terminate(&pacMan);
     GHOST_terminate(&pinky);
-    free(tileSet);
+    MAP_terminate(tileSet);
     app_close();
 
     return 0;
