@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
 
     //Event handler
     SDL_Event e;
+
     //Create pacman
     PACMAN pacMan;
     PACMAN_init(&pacMan, 30, 30);
@@ -42,12 +43,12 @@ int main(int argc, char *argv[]) {
             }
         }
         if (!pause) {
+            //Pacman logic
             PACMAN_handle(&pacMan, tileSet, e);
-            //Animate pacman
             PACMAN_action(&pacMan);
-            //Move pacman
             PACMAN_move(&pacMan, tileSet);
 
+            //Ghosts logic
             GHOST_action(&pinky);
         }
 
@@ -61,6 +62,7 @@ int main(int argc, char *argv[]) {
         //Render pacman to window
         PACMAN_render(&pacMan);
 
+        //Render ghosts
         GHOST_render(&pinky);
 
         //Control speed of app

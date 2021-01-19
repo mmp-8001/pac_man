@@ -50,8 +50,8 @@ extern bool LTexture_loadFromFile(LTexture *obj, char *path) {
 }
 
 //This function render our loaded surface to window
-void
-extern LTexture_render(LTexture *obj, int x, int y, SDL_Rect *clip, double angle, SDL_Point *center, SDL_RendererFlip flip) {
+extern void
+LTexture_render(LTexture *obj, int x, int y, SDL_Rect *clip, double angle, SDL_Point *center, SDL_RendererFlip flip) {
     //Set rendering space and render to screen
     SDL_Rect renderQuad = {x, y, obj->mWidth, obj->mHeight};
 

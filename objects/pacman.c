@@ -12,7 +12,7 @@ enum PACMAN_MOVE {
     PAC_UP = SDLK_UP, PAC_DOWN = SDLK_DOWN, PAC_RIGHT = SDLK_RIGHT, PAC_LEFT = SDLK_LEFT
 };
 
-//Const global variable for our pacman
+//Global variable for this
 static const int PACMAN_WIDTH = 30;
 static const int PACMAN_HEIGHT = 30;
 static const int PACMAN_VEL = 1;
@@ -64,6 +64,7 @@ extern void PACMAN_action(PACMAN *obj) {
 
 //This function handle pacman direction and next move
 extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
+    //Declare time and move to save move for PACMAN_NEXT_MOVE times
     static int time = 0, move;
 
     //Get pac man velocity

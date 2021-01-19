@@ -8,8 +8,8 @@
 const char gAppName[] = "PAC-MAN";
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 600;
-const int SCREEN_HEIGHT = 600;
+const int SCREEN_WIDTH = 690;
+const int SCREEN_HEIGHT = 660;
 
 //Control app speed
 int const APP_DELAY = 10;
