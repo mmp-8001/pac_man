@@ -32,10 +32,13 @@ extern Tile ***MAP_init();
 //Extern map render to render map to window
 extern void MAP_render(Tile ***tileSet);
 
-//Extern map touches to check if an object touch map's components
-extern bool MAP_touches(SDL_Rect box, Tile ***tiles);
+//Extern map touches seed to check if touches seed
+extern void MAP_touches_seed(SDL_Rect box, Tile ***tiles);
 
 //Extern map terminator to terminate map
 extern void MAP_terminate(Tile ***tileSet);
+
+//Extern map touch wall to check if touch  wall
+extern bool MAP_touches_wall(SDL_Rect box, Tile ***tiles);
 
 #endif //PAC_MAN_MAP_H

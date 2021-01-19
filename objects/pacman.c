@@ -90,7 +90,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
             obj->pBox.y -= vel;
 
             //Check we have collision or not
-            if (!(obj->pBox.y < 0) && !MAP_touches(obj->pBox, tileSet)) {
+            if (!MAP_touches_wall(obj->pBox, tileSet)) {
                 obj->pMove = PAC_UP;
                 obj->pAngle = 270;
             } else {
@@ -103,7 +103,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
                 }
 
                 //If we have collision again we should place pacman in last position
-                if (!(obj->pBox.y < 0) && !MAP_touches(obj->pBox, tileSet)) {
+                if (!MAP_touches_wall(obj->pBox, tileSet)) {
                     obj->pMove = PAC_UP;
                     obj->pAngle = 270;
                 } else {
@@ -126,7 +126,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
             obj->pBox.y += vel;
 
             //Check we have collision or not
-            if (!(obj->pBox.y + obj->pBox.h > SCREEN_HEIGHT) && !MAP_touches(obj->pBox, tileSet)) {
+            if (!MAP_touches_wall(obj->pBox, tileSet)) {
                 obj->pMove = PAC_DOWN;
                 obj->pAngle = 90;
             } else {
@@ -139,7 +139,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
                 }
 
                 //If we have collision again we should place pacman in last position
-                if (!(obj->pBox.y + obj->pBox.h > SCREEN_HEIGHT) && !MAP_touches(obj->pBox, tileSet)) {
+                if (!MAP_touches_wall(obj->pBox, tileSet)) {
                     obj->pMove = PAC_DOWN;
                     obj->pAngle = 90;
                 } else {
@@ -162,7 +162,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
             obj->pBox.x += vel;
 
             //Check we have collision or not
-            if (!(obj->pBox.x + obj->pBox.w > SCREEN_WIDTH) && !MAP_touches(obj->pBox, tileSet)) {
+            if (!MAP_touches_wall(obj->pBox, tileSet)) {
                 obj->pMove = PAC_RIGHT;
                 if (obj->pAngle == 180 || obj->pAngle == 270 || obj->pAngle == 90) {
                     obj->pFlipType = SDL_FLIP_NONE;
@@ -178,7 +178,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
                 }
 
                 //If we have collision again we should place pacman in last position
-                if (!(obj->pBox.x + obj->pBox.w > SCREEN_WIDTH) && !MAP_touches(obj->pBox, tileSet)) {
+                if (!MAP_touches_wall(obj->pBox, tileSet)) {
                     obj->pMove = PAC_RIGHT;
                     if (obj->pAngle == 180 || obj->pAngle == 270 || obj->pAngle == 90) {
                         obj->pFlipType = SDL_FLIP_NONE;
@@ -204,7 +204,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
             obj->pBox.x -= vel;
 
             //Check we have collision or not
-            if (!(obj->pBox.x < 0) && !MAP_touches(obj->pBox, tileSet)) {
+            if (!MAP_touches_wall(obj->pBox, tileSet)) {
                 obj->pMove = PAC_LEFT;
                 if (obj->pAngle == 0 || obj->pAngle == 270 || obj->pAngle == 90) {
                     obj->pFlipType = SDL_FLIP_VERTICAL;
@@ -220,7 +220,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
                 }
 
                 //If we have collision again we should place pacman in last position
-                if (!(obj->pBox.x < 0) && !MAP_touches(obj->pBox, tileSet)) {
+                if (!MAP_touches_wall(obj->pBox, tileSet)) {
                     obj->pMove = PAC_LEFT;
                     if (obj->pAngle == 0 || obj->pAngle == 270 || obj->pAngle == 90) {
                         obj->pFlipType = SDL_FLIP_VERTICAL;
@@ -251,7 +251,7 @@ extern void PACMAN_move(PACMAN *obj, Tile ***tileSet) {
         case PAC_UP:
             //Go up and then check if we have collision place pacman in last position
             obj->pBox.y -= vel;
-            if (obj->pBox.y < 0 || MAP_touches(obj->pBox, tileSet)) {
+            if (MAP_touches_wall(obj->pBox, tileSet)) {
                 obj->pBox.y += vel;
             }
             break;
@@ -260,7 +260,7 @@ extern void PACMAN_move(PACMAN *obj, Tile ***tileSet) {
         case PAC_DOWN:
             //Go down and then check if we have collision place pacman in last position
             obj->pBox.y += vel;
-            if (obj->pBox.y + obj->pBox.h > SCREEN_HEIGHT || MAP_touches(obj->pBox, tileSet)) {
+            if (MAP_touches_wall(obj->pBox, tileSet)) {
                 obj->pBox.y -= vel;
             }
             break;
@@ -269,7 +269,7 @@ extern void PACMAN_move(PACMAN *obj, Tile ***tileSet) {
         case PAC_RIGHT:
             //Go right and then check if we have collision place pacman in last position
             obj->pBox.x += vel;
-            if (obj->pBox.x + obj->pBox.w > SCREEN_WIDTH || MAP_touches(obj->pBox, tileSet)) {
+            if (MAP_touches_wall(obj->pBox, tileSet)) {
                 obj->pBox.x -= vel;
             }
             break;
@@ -278,11 +278,13 @@ extern void PACMAN_move(PACMAN *obj, Tile ***tileSet) {
         case PAC_LEFT:
             //Go left and then check if we have collision place pacman in last position
             obj->pBox.x -= vel;
-            if (obj->pBox.x < 0 || MAP_touches(obj->pBox, tileSet)) {
+            if (MAP_touches_wall(obj->pBox, tileSet)) {
                 obj->pBox.x += vel;
             }
             break;
     }
+    //Check if pacman touches seed
+    MAP_touches_seed(obj->pBox, tileSet);
 }
 
 //This function create different status of pacman

@@ -17,6 +17,8 @@ static void get_tile_type(Tile *tile, int row, int col);
 
 bool is_wall(Tile *tile);
 
+static bool out_of_map(SDL_Rect box);
+
 //Global variable for this file
 static const int TILE_WIDTH = 30;
 static const int TILE_HEIGHT = 30;
@@ -270,46 +272,18 @@ static bool check_collision(SDL_Rect a, SDL_Rect b) {
     return true;
 }
 
-//Checks collision box against set of tiles
-extern bool MAP_touches(SDL_Rect box, Tile ***tiles) {
+//Checks if touches seed in map
+extern void MAP_touches_seed(SDL_Rect box, Tile ***tiles) {
     int p_col, p_row;
-    Tile *sides[8] = {NULL};
     //Get current position
     p_col = (box.x + 15) / TILE_WIDTH;
     p_row = (box.y + 15) / TILE_HEIGHT;
-
-    //Get tiles around current tile
-    sides[0] = (0 <= p_col - 1) ? tiles[p_row][p_col - 1] : NULL;
-    sides[1] = (p_col + 1 < MAP_COL) ? tiles[p_row][p_col + 1] : NULL;
-    if (0 <= p_row - 1) {
-        sides[2] = tiles[p_row - 1][p_col];
-        sides[3] = (0 <= p_col - 1) ? tiles[p_row - 1][p_col - 1] : NULL;
-        sides[4] = (p_col + 1 < MAP_COL) ? tiles[p_row - 1][p_col + 1] : NULL;
-    }
-    if (p_row + 1 < MAP_ROW) {
-        sides[5] = tiles[p_row + 1][p_col];
-        sides[6] = (0 <= p_col - 1) ? tiles[p_row + 1][p_col - 1] : NULL;
-        sides[7] = (p_col + 1 < MAP_COL) ? tiles[p_row + 1][p_col + 1] : NULL;
-    }
 
     //If seed in current position eat that
     if (tiles[p_row][p_col]->mType == 2) {
         Mix_PlayChannel(-1, gPacmanMunch, 0);
         tiles[p_row][p_col]->mType = 1;
     }
-
-    //Go through the side tiles
-    for (int i = 0; i < 8; ++i) {
-        //If we have tile and that tile is wall so check for collision
-        if (sides[i] != NULL && (is_wall(sides[i]))) {
-            //If the collision box touches the wall tile
-            if (check_collision(box, sides[i]->mBox)) {
-                return true;
-            }
-        }
-    }
-    //If no wall tiles were touched
-    return false;
 }
 
 //This function load audio in map
@@ -360,4 +334,47 @@ extern void MAP_terminate(Tile ***tileSet) {
     //Free munch audio
     Mix_FreeChunk(gPacmanMunch);
     gPacmanMunch = NULL;
+}
+
+//Check if collision with wall
+extern bool MAP_touches_wall(SDL_Rect box, Tile ***tiles) {
+    int p_col, p_row;
+    if (!out_of_map(box)) {
+        Tile *sides[8] = {NULL};
+        //Get current position
+        p_col = (box.x + 15) / TILE_WIDTH;
+        p_row = (box.y + 15) / TILE_HEIGHT;
+
+        //Get tiles around current tile
+        sides[0] = (0 <= p_col - 1) ? tiles[p_row][p_col - 1] : NULL;
+        sides[1] = (p_col + 1 < MAP_COL) ? tiles[p_row][p_col + 1] : NULL;
+        if (0 <= p_row - 1) {
+            sides[2] = tiles[p_row - 1][p_col];
+            sides[3] = (0 <= p_col - 1) ? tiles[p_row - 1][p_col - 1] : NULL;
+            sides[4] = (p_col + 1 < MAP_COL) ? tiles[p_row - 1][p_col + 1] : NULL;
+        }
+        if (p_row + 1 < MAP_ROW) {
+            sides[5] = tiles[p_row + 1][p_col];
+            sides[6] = (0 <= p_col - 1) ? tiles[p_row + 1][p_col - 1] : NULL;
+            sides[7] = (p_col + 1 < MAP_COL) ? tiles[p_row + 1][p_col + 1] : NULL;
+        }
+        //Go through the side tiles
+        for (int i = 0; i < 8; ++i) {
+            //If we have tile and that tile is wall so check for collision
+            if ((sides[i] != NULL && (is_wall(sides[i])))) {
+                //If the collision box touches the wall tile
+                if (check_collision(box, sides[i]->mBox)) {
+                    return true;
+                }
+            }
+        }
+        //If no wall tiles were touched
+        return false;
+    }
+    return true;
+}
+//Check if go out of screen
+static bool out_of_map(SDL_Rect box) {
+    if ((box.y < 0) || (box.y + box.h > SCREEN_HEIGHT) || (box.x + box.w > SCREEN_WIDTH) || (box.x < 0))return true;
+    return false;
 }
