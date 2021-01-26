@@ -56,9 +56,13 @@ int main(int argc, char *argv[]) {
 
             //Ghosts logic
             GHOST_action(&pinky);
+            GHOST_move(&pinky, &pacMan, tileSet);
             GHOST_action(&blinky);
+            GHOST_move(&blinky, &pacMan, tileSet);
             GHOST_action(&inky);
+            GHOST_move(&inky, &pacMan, tileSet);
             GHOST_action(&clyde);
+            GHOST_move(&clyde, &pacMan, tileSet);
         }
 
         //Clear screen

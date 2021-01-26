@@ -41,4 +41,7 @@ extern void MAP_terminate(Tile ***tileSet);
 //Extern map touch wall to check if touch  wall
 extern bool MAP_touches_wall(SDL_Rect box, Tile ***tiles);
 
+//Extern map tile distance to get distance of two tile
+extern int MAP_tile_distance(Tile a, Tile b);
+
 #endif //PAC_MAN_MAP_H

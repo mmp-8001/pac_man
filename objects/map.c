@@ -3,6 +3,7 @@
 //
 
 #include "map.h"
+#include <math.h>
 
 //Prototype for this file functions
 static void create_tile();
@@ -377,4 +378,10 @@ extern bool MAP_touches_wall(SDL_Rect box, Tile ***tiles) {
 static bool out_of_map(SDL_Rect box) {
     if ((box.y < 0) || (box.y + box.h > SCREEN_HEIGHT) || (box.x + box.w > SCREEN_WIDTH) || (box.x < 0))return true;
     return false;
+}
+
+//This function get distance of two tiles
+extern int MAP_tile_distance(Tile a, Tile b) {
+    return (pow((a.mBox.x + TILE_WIDTH / 2) - (b.mBox.x + TILE_WIDTH / 2), 2) +
+            pow((a.mBox.y + TILE_HEIGHT) - (b.mBox.y + TILE_HEIGHT), 2));
 }

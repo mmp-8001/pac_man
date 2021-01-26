@@ -9,6 +9,8 @@ static void create_status();
 
 static bool proper_pic(char pic[], char name[]);
 
+static bool is_least(int s, int num1, int num2, int num3);
+
 //Const global variable for our pacman
 static const int GHOST_WIDTH = 30;
 static const int GHOST_HEIGHT = 30;
@@ -87,6 +89,68 @@ extern void GHOST_action(GHOST *obj) {
     frame++;
 }
 
+//This function implement ghosts AI
+extern void GHOST_move(GHOST *gObj, PACMAN *pObj, Tile ***tileSet) {
+    int p_col, p_row, g_col, g_row, up, right, down, left;
+
+    //Get tile which pacman is in
+    p_col = (pObj->pBox.x) / 30;
+    p_row = (pObj->pBox.y) / 30;
+
+    //Get tile which ghost is in
+    g_col = (gObj->gBox.x) / 30;
+    g_row = (gObj->gBox.y) / 30;
+
+    //If completely in tile
+    if (tileSet[g_row][g_col]->mBox.x == gObj->gBox.x && tileSet[g_row][g_col]->mBox.y == gObj->gBox.y) {
+        //Check if we can go up
+        gObj->gBox.y -= 1;
+        up = !MAP_touches_wall(gObj->gBox, tileSet);
+        gObj->gBox.y += 1;
+
+        //Check if we can go right
+        gObj->gBox.x += 1;
+        right = !MAP_touches_wall(gObj->gBox, tileSet);
+        gObj->gBox.x -= 1;
+
+        //Check if we can go down
+        gObj->gBox.y += 1;
+        down = !MAP_touches_wall(gObj->gBox, tileSet);
+        gObj->gBox.y -= 1;
+
+        //Check if we can go left
+        gObj->gBox.x -= 1;
+        left = !MAP_touches_wall(gObj->gBox, tileSet);
+        gObj->gBox.x += 1;
+        //If we have one direction left to go
+        if ((up & !right & !down & !left) || (right & !up & !down & !left) || (down & !right & !up & !left) ||
+            (left & !right & !down & !up)) {
+            gObj->gMove = up ? G_UP : gObj->gMove;
+            gObj->gMove = right ? G_RIGHT : gObj->gMove;
+            gObj->gMove = down ? G_DOWN : gObj->gMove;
+            gObj->gMove = left ? G_LEFT : gObj->gMove;
+        } else {
+            up = (gObj->gMove == G_DOWN) ? false : up;
+            right = (gObj->gMove == G_LEFT) ? false : right;
+            down = (gObj->gMove == G_UP) ? false : down;
+            left = (gObj->gMove == G_RIGHT) ? false : left;
+            up = up ? MAP_tile_distance(*tileSet[g_row - 1][g_col], *tileSet[p_row][p_col]) : -1;
+            right = right ? MAP_tile_distance(*tileSet[g_row][g_col + 1], *tileSet[p_row][p_col]) : -1;
+            down = down ? MAP_tile_distance(*tileSet[g_row + 1][g_col], *tileSet[p_row][p_col]) : -1;
+            left = left ? MAP_tile_distance(*tileSet[g_row][g_col - 1], *tileSet[p_row][p_col]) : -1;
+            if ((up != -1 && is_least(up, right, down, left))) gObj->gMove = G_UP;
+            else if ((down != -1 && is_least(down, right, up, left))) gObj->gMove = G_DOWN;
+            else if ((right != -1 && is_least(right, up, down, left)))gObj->gMove = G_RIGHT;
+            else if ((left != -1 && is_least(left, right, down, up))) gObj->gMove = G_LEFT;
+        }
+    }
+    int vel = gObj->gVelocity;
+    if (gObj->gMove == G_UP)gObj->gBox.y -= vel; //If want to go up
+    else if (gObj->gMove == G_DOWN)gObj->gBox.y += vel;//If want to go down
+    else if (gObj->gMove == G_RIGHT)gObj->gBox.x += vel;//If want to go right
+    else if (gObj->gMove == G_LEFT)gObj->gBox.x -= vel;;//If want to go left
+}
+
 //This function create different status of ghost
 static void create_status() {
     //Status 0 face up state 0
@@ -136,4 +200,17 @@ static void create_status() {
     GHOST_SPRITE_CLIP[7].y = 90;
     GHOST_SPRITE_CLIP[7].w = 30;
     GHOST_SPRITE_CLIP[7].h = 30;
+}
+
+static bool is_least(int s, int num1, int num2, int num3) {
+    if (num1 > 0 && num1 < s) {
+        return false;
+    }
+    if (num2 > 0 && num2 < s) {
+        return false;
+    }
+    if (num3 > 0 && num3 < s) {
+        return false;
+    }
+    return true;
 }

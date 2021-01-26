@@ -8,6 +8,7 @@
 #include "SDL2/SDL.h"
 #include "../main/LTexture.h"
 #include "../objects/map.h"
+#include "pacman.h"
 
 //Properties of ghost
 typedef struct {
@@ -28,7 +29,10 @@ extern void GHOST_terminate(GHOST *obj);
 //Extern ghost render to render ghost to window
 extern void GHOST_render(GHOST *obj);
 
-//Extern action function to make ghost alive
+//Extern ghost action function to make ghost alive
 extern void GHOST_action(GHOST *obj);
+
+//Extern ghost move to implement ghosts AI
+extern void GHOST_move(GHOST *gObj, PACMAN *pObj, Tile ***tileSet);
 
 #endif //PAC_MAN_GHOST_H
