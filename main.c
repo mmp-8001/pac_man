@@ -26,7 +26,13 @@ int main(int argc, char *argv[]) {
 
     //Create ghosts
     GHOST pinky;
-    GHOST_init(&pinky, 0, 30, "PINKY");
+    GHOST_init(&pinky, 30, 30, "PINKY");
+    GHOST blinky;
+    GHOST_init(&blinky, 300, 300, "BLINKY");
+    GHOST inky;
+    GHOST_init(&inky, 510, 480, "INKY");
+    GHOST clyde;
+    GHOST_init(&clyde, 30, 480, "CLYDE");
 
     //Main loop, While application is running
     while (!quit) {
@@ -50,6 +56,9 @@ int main(int argc, char *argv[]) {
 
             //Ghosts logic
             GHOST_action(&pinky);
+            GHOST_action(&blinky);
+            GHOST_action(&inky);
+            GHOST_action(&clyde);
         }
 
         //Clear screen
@@ -64,6 +73,9 @@ int main(int argc, char *argv[]) {
 
         //Render ghosts
         GHOST_render(&pinky);
+        GHOST_render(&blinky);
+        GHOST_render(&inky);
+        GHOST_render(&clyde);
 
         //Control speed of app
         SDL_Delay(APP_DELAY);
@@ -75,6 +87,9 @@ int main(int argc, char *argv[]) {
     //Destroy all objects in app
     PACMAN_terminate(&pacMan);
     GHOST_terminate(&pinky);
+    GHOST_terminate(&blinky);
+    GHOST_terminate(&inky);
+    GHOST_terminate(&clyde);
     MAP_terminate(tileSet);
     app_close();
 

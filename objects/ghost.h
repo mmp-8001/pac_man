@@ -12,13 +12,11 @@
 //Properties of ghost
 typedef struct {
     int gStatus;
-    int gAngle;
     int gVelocity;
     int gMove;
     char gName[10];
     LTexture gTexture;
     SDL_Rect gBox;
-    SDL_RendererFlip gFlipType;
 } GHOST;
 
 //Extern ghost initialization
