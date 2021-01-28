@@ -8,6 +8,11 @@
 #include "../common/pac_common.h"
 #include "../main/LTexture.h"
 
+//Variables for app
+extern const int MAP_ROW;
+extern const int MAP_COL;
+
+//Wall type enum
 typedef enum {
     TILE_WALL_PARALLEL,
     TILE_TRANS,
@@ -43,5 +48,8 @@ extern bool MAP_touches_wall(SDL_Rect box, Tile ***tiles);
 
 //Extern map tile distance to get distance of two tile
 extern int MAP_tile_distance(Tile a, Tile b);
+
+//Extern map is wall to check if is wall
+extern bool MAP_is_wall(Tile *tile);
 
 #endif //PAC_MAN_MAP_H

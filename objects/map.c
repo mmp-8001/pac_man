@@ -16,15 +16,15 @@ static void load_audio();
 
 static void get_tile_type(Tile *tile, int row, int col);
 
-bool is_wall(Tile *tile);
-
 static bool out_of_map(SDL_Rect box);
+
+//Variables for app
+const int MAP_COL = 23;
+const int MAP_ROW = 22;
 
 //Global variable for this file
 static const int TILE_WIDTH = 30;
 static const int TILE_HEIGHT = 30;
-static const int MAP_COL = 23;
-static const int MAP_ROW = 22;
 static char TILES_PIC[] = "../assets/tiles.png";
 static SDL_Rect gTileClips[8];
 static LTexture gTileTexture;
@@ -298,7 +298,7 @@ static void load_audio() {
 }
 
 //This function check if tile is wall one
-bool is_wall(Tile *tile) {
+extern bool MAP_is_wall(Tile *tile) {
     if (tile->mType == TILE_WALL_PARALLEL
         || tile->mType == TILE_WALL_ROUND
         || tile->mType == TILE_WALL_CUBE
@@ -316,12 +316,12 @@ extern void MAP_terminate(Tile ***tileSet) {
         for (int j = 0; j < MAP_COL; ++j) {
             if (tileSet[i][j] != NULL) {//Free tile
                 free(tileSet[i][j]);
-                tileSet[i][j] == NULL;
+                tileSet[i][j] = NULL;
             }
         }
         if (tileSet[i] != NULL) {//Free row
+            tileSet[i] = NULL;
             free(tileSet[i]);
-            tileSet[i] == NULL;
         }
     }
     if (tileSet != NULL) {//Free all tiles
@@ -362,7 +362,7 @@ extern bool MAP_touches_wall(SDL_Rect box, Tile ***tiles) {
         //Go through the side tiles
         for (int i = 0; i < 8; ++i) {
             //If we have tile and that tile is wall so check for collision
-            if ((sides[i] != NULL && (is_wall(sides[i])))) {
+            if ((sides[i] != NULL && (MAP_is_wall(sides[i])))) {
                 //If the collision box touches the wall tile
                 if (check_collision(box, sides[i]->mBox)) {
                     return true;
@@ -374,6 +374,7 @@ extern bool MAP_touches_wall(SDL_Rect box, Tile ***tiles) {
     }
     return true;
 }
+
 //Check if go out of screen
 static bool out_of_map(SDL_Rect box) {
     if ((box.y < 0) || (box.y + box.h > SCREEN_HEIGHT) || (box.x + box.w > SCREEN_WIDTH) || (box.x < 0))return true;
@@ -383,5 +384,5 @@ static bool out_of_map(SDL_Rect box) {
 //This function get distance of two tiles
 extern int MAP_tile_distance(Tile a, Tile b) {
     return (pow((a.mBox.x + TILE_WIDTH / 2) - (b.mBox.x + TILE_WIDTH / 2), 2) +
-            pow((a.mBox.y + TILE_HEIGHT) - (b.mBox.y + TILE_HEIGHT), 2));
+            pow((a.mBox.y + TILE_HEIGHT / 2) - (b.mBox.y + TILE_HEIGHT / 2), 2));
 }

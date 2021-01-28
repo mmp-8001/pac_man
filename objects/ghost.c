@@ -4,12 +4,30 @@
 
 #include "ghost.h"
 
+//coordinate point structure
+typedef struct POINT POINT;
+struct POINT {
+    int pCol;
+    int pRow;
+    POINT *previous_point;
+};
+
 //Prototype for this file functions
 static void create_status();
 
 static bool proper_pic(char pic[], char name[]);
 
-static bool is_least(int s, int num1, int num2, int num3);
+static bool is_smallest(int s, int num1, int num2, int num3);
+
+static void
+scatter_mood(GHOST *gObj, Tile ***tileSet, int up, int right, int down, int left, int g_row, int g_col, int des_row,
+             int des_col);
+
+static bool isValid(int row, int col);
+
+static void init_zero(int row, int col, int array[row][col]);
+
+static POINT shortest_path(GHOST *gObj, Tile ***tileSet, int src_row, int src_col, int des_row, int des_col);
 
 //Const global variable for our pacman
 static const int GHOST_WIDTH = 30;
@@ -17,6 +35,9 @@ static const int GHOST_HEIGHT = 30;
 static const int GHOST_VEL = 1;
 static const int WALKING_ANIMATION_FRAMES = 2;
 static const int ANIMATION_DELAY = 60;
+static const int SCATTER_MOOD_TIME = 5;
+static const int CHASE_MOOD_TIME = 10;
+
 static SDL_Rect GHOST_SPRITE_CLIP[8];
 enum GHOST_face {
     G_F_UP = 0, G_F_RIGHT = 2, G_F_DOWN = 4, G_F_LEFT = 6
@@ -24,6 +45,13 @@ enum GHOST_face {
 enum GHOST_move {
     G_UP, G_RIGHT, G_DOWN, G_LEFT
 };
+enum GHOST_mood {
+    G_SCATTER, G_CHASE
+};
+
+//For up, left, right and down
+int rowNum[] = {-1, 0, 0, 1};
+int colNum[] = {0, -1, 1, 0};
 
 //This function create one ghost
 extern void GHOST_init(GHOST *obj, int posX, int posY, char name[]) {
@@ -37,6 +65,7 @@ extern void GHOST_init(GHOST *obj, int posX, int posY, char name[]) {
     create_status();
     obj->gStatus = 0;
     obj->gMove = G_RIGHT;
+    obj->gMood = G_SCATTER;
     obj->gVelocity = GHOST_VEL;
     obj->gBox.x = posX;
     obj->gBox.y = posY;
@@ -92,6 +121,7 @@ extern void GHOST_action(GHOST *obj) {
 //This function implement ghosts AI
 extern void GHOST_move(GHOST *gObj, PACMAN *pObj, Tile ***tileSet) {
     int p_col, p_row, g_col, g_row, up, right, down, left;
+    bool not_get_back = true;
 
     //Get tile which pacman is in
     p_col = (pObj->pBox.x) / 30;
@@ -122,26 +152,50 @@ extern void GHOST_move(GHOST *gObj, PACMAN *pObj, Tile ***tileSet) {
         gObj->gBox.x -= 1;
         left = !MAP_touches_wall(gObj->gBox, tileSet);
         gObj->gBox.x += 1;
+
+        //Change ghost mood
+        if ((SDL_GetTicks() / 1000) % (CHASE_MOOD_TIME + SCATTER_MOOD_TIME) == SCATTER_MOOD_TIME) {
+            if (gObj->gMood != G_CHASE)not_get_back = false;
+            gObj->gMood = G_CHASE;
+        }
+        if ((SDL_GetTicks() / 1000) % (CHASE_MOOD_TIME + SCATTER_MOOD_TIME) == 0) {
+            if (gObj->gMood != G_SCATTER)not_get_back = false;
+            gObj->gMood = G_SCATTER;
+        }
+
         //If we have one direction left to go
         if ((up & !right & !down & !left) || (right & !up & !down & !left) || (down & !right & !up & !left) ||
             (left & !right & !down & !up)) {
-            gObj->gMove = up ? G_UP : gObj->gMove;
-            gObj->gMove = right ? G_RIGHT : gObj->gMove;
-            gObj->gMove = down ? G_DOWN : gObj->gMove;
-            gObj->gMove = left ? G_LEFT : gObj->gMove;
+            if (up) gObj->gMove = G_UP;
+            else if (right) gObj->gMove = G_RIGHT;
+            else if (down) gObj->gMove = G_DOWN;
+            else if (left) gObj->gMove = G_LEFT;
         } else {
-            up = (gObj->gMove == G_DOWN) ? false : up;
-            right = (gObj->gMove == G_LEFT) ? false : right;
-            down = (gObj->gMove == G_UP) ? false : down;
-            left = (gObj->gMove == G_RIGHT) ? false : left;
-            up = up ? MAP_tile_distance(*tileSet[g_row - 1][g_col], *tileSet[p_row][p_col]) : -1;
-            right = right ? MAP_tile_distance(*tileSet[g_row][g_col + 1], *tileSet[p_row][p_col]) : -1;
-            down = down ? MAP_tile_distance(*tileSet[g_row + 1][g_col], *tileSet[p_row][p_col]) : -1;
-            left = left ? MAP_tile_distance(*tileSet[g_row][g_col - 1], *tileSet[p_row][p_col]) : -1;
-            if ((up != -1 && is_least(up, right, down, left))) gObj->gMove = G_UP;
-            else if ((down != -1 && is_least(down, right, up, left))) gObj->gMove = G_DOWN;
-            else if ((right != -1 && is_least(right, up, down, left)))gObj->gMove = G_RIGHT;
-            else if ((left != -1 && is_least(left, right, down, up))) gObj->gMove = G_LEFT;
+            //If mood of ghost changed so they can get back
+            if (not_get_back) {
+                up = (gObj->gMove == G_DOWN) ? false : up;
+                right = (gObj->gMove == G_LEFT) ? false : right;
+                down = (gObj->gMove == G_UP) ? false : down;
+                left = (gObj->gMove == G_RIGHT) ? false : left;
+            }
+
+            //If in scatter mood
+            if (gObj->gMood == G_SCATTER) {
+                int s_row, s_col;
+                if (strcmp(gObj->gName, "PINKY") == 0) s_row = 0, s_col = 0;
+                else if (strcmp(gObj->gName, "BLINKY") == 0) s_row = 0, s_col = 22;
+                else if (strcmp(gObj->gName, "INKY") == 0) s_row = 21, s_col = 22;
+                else if (strcmp(gObj->gName, "CLYDE") == 0) s_row = 21, s_col = 0;
+                scatter_mood(gObj, tileSet, up, right, down, left, g_row, g_col, s_row, s_col);
+            } else if (gObj->gMood == G_CHASE) {//Else if in chase mood
+                POINT next_move = shortest_path(gObj, tileSet, g_row, g_col, p_row, p_col);
+                if (next_move.pRow == g_row && next_move.pCol == g_col)
+                    scatter_mood(gObj, tileSet, up, right, down, left, g_row, g_col, p_row, p_col);
+                else if (next_move.pRow < g_row) gObj->gMove = G_UP;
+                else if (next_move.pRow > g_row) gObj->gMove = G_DOWN;
+                else if (next_move.pCol > g_col)gObj->gMove = G_RIGHT;
+                else if (next_move.pCol < g_col) gObj->gMove = G_LEFT;
+            }
         }
     }
     int vel = gObj->gVelocity;
@@ -202,7 +256,8 @@ static void create_status() {
     GHOST_SPRITE_CLIP[7].h = 30;
 }
 
-static bool is_least(int s, int num1, int num2, int num3) {
+//This function check if specified int is smaller than another
+static bool is_smallest(int s, int num1, int num2, int num3) {
     if (num1 > 0 && num1 < s) {
         return false;
     }
@@ -213,4 +268,104 @@ static bool is_least(int s, int num1, int num2, int num3) {
         return false;
     }
     return true;
+}
+
+//This function implement ghost scatter mood
+static void
+scatter_mood(GHOST *gObj, Tile ***tileSet, int up, int right, int down, int left, int g_row, int g_col, int des_row,
+             int des_col) {
+    //Don't allow ghost to get back
+    up = up ? MAP_tile_distance(*tileSet[g_row - 1][g_col], *tileSet[des_row][des_col]) : -1;
+    right = right ? MAP_tile_distance(*tileSet[g_row][g_col + 1], *tileSet[des_row][des_col]) : -1;
+    down = down ? MAP_tile_distance(*tileSet[g_row + 1][g_col], *tileSet[des_row][des_col]) : -1;
+    left = left ? MAP_tile_distance(*tileSet[g_row][g_col - 1], *tileSet[des_row][des_col]) : -1;
+
+    //Which way get ghost closer to destination
+    if ((up != -1 && is_smallest(up, right, down, left))) gObj->gMove = G_UP;
+    else if ((down != -1 && is_smallest(down, right, up, left))) gObj->gMove = G_DOWN;
+    else if ((right != -1 && is_smallest(right, up, down, left)))gObj->gMove = G_RIGHT;
+    else if ((left != -1 && is_smallest(left, right, down, up))) gObj->gMove = G_LEFT;
+}
+
+//This function find shortest path from source to destination
+static POINT shortest_path(GHOST *gObj, Tile ***tileSet, int src_row, int src_col, int des_row, int des_col) {
+    //Initialization and declaration
+    int visited[MAP_ROW][MAP_COL], index = 1, point = 0;
+    POINT points[500] = {0, 0, NULL};
+
+    //Init visited to zero
+    init_zero(MAP_ROW, MAP_COL, visited);
+
+    //Init source
+    points[0].pCol = src_col;
+    points[0].pRow = src_row;
+    points[0].previous_point = NULL;
+
+    //Mark source as visited
+    visited[src_row][src_col] = 1;
+
+    //Mark behind of ghost as visited
+    if (gObj->gMove == G_UP && isValid(src_row + 1, src_col))visited[src_row + 1][src_col] = 1;
+    else if (gObj->gMove == G_DOWN && isValid(src_row - 1, src_col))visited[src_row - 1][src_col] = 1;
+    else if (gObj->gMove == G_RIGHT && isValid(src_row, src_col - 1))visited[src_row][src_col - 1] = 1;
+    else if (gObj->gMove == G_LEFT && isValid(src_row, src_col + 1))visited[src_row][src_col + 1] = 1;
+
+    while (1) {
+        //If can't find path under certain circumstances
+        if (points[point].previous_point == NULL && points[point].pCol == 0 && points[point].pRow == 0) {
+            return points[0];
+        }
+
+        //If reach destination break loop
+        if (points[point].pRow == des_row && points[point].pCol == des_col) {
+            break;
+        }
+
+        //Get up, right, left and down of present tile
+        for (int i = 0; i < 4; i++) {
+            int row = points[point].pRow + rowNum[i];
+            int col = points[point].pCol + colNum[i];
+
+            //If adjacent cell is valid, has path and not visited yet, enqueue it.
+            if (isValid(row, col) && !MAP_is_wall(tileSet[row][col]) != 0 &&
+                !visited[row][col]) {
+                //Mark cell as visited and enqueue it
+                visited[row][col] = true;
+                points[index].pRow = row;
+                points[index].pCol = col;
+                points[index].previous_point = &points[point];
+                index++;
+            }
+        }
+        point++;
+    }
+    //Get present point and go down to reach one left to end
+    POINT *present = &points[point];
+    while (1) {
+        if (present->previous_point == NULL) {
+            break;
+        }
+        if (present->previous_point->previous_point == NULL) {
+            break;
+        }
+        present = present->previous_point;
+    }
+    return *present;
+}
+
+//Check if cell or not.
+static bool isValid(int row, int col) {
+    //Return true if row number and column number is in range
+    return (row >= 0) && (row < MAP_ROW) &&
+           (col >= 0) && (col < MAP_COL);
+}
+
+//Init 2D array with zero
+static void init_zero(int row, int col, int array[row][col]) {
+    //Iterate over all cell an init them with zero
+    for (int i = 0; i < row; ++i) {
+        for (int j = 0; j < col; ++j) {
+            array[i][j] = 0;
+        }
+    }
 }

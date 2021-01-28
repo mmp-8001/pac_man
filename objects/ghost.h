@@ -15,6 +15,7 @@ typedef struct {
     int gStatus;
     int gVelocity;
     int gMove;
+    int gMood;
     char gName[10];
     LTexture gTexture;
     SDL_Rect gBox;
