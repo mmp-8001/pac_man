@@ -119,7 +119,7 @@ extern void GHOST_action(GHOST *obj) {
 }
 
 //This function implement ghosts AI
-extern void GHOST_move(GHOST *gObj, PACMAN *pObj, Tile ***tileSet) {
+extern void GHOST_move(GHOST *gObj, PACMAN *pObj, Tile ***tileSet, GHOST blinky) {
     int p_col, p_row, g_col, g_row, up, right, down, left;
     bool not_get_back = true;
 
@@ -183,14 +183,32 @@ extern void GHOST_move(GHOST *gObj, PACMAN *pObj, Tile ***tileSet) {
             if (gObj->gMood == G_SCATTER) {
                 int s_row, s_col;
                 if (strcmp(gObj->gName, "PINKY") == 0) s_row = 0, s_col = 0;
-                else if (strcmp(gObj->gName, "BLINKY") == 0) s_row = 0, s_col = 22;
-                else if (strcmp(gObj->gName, "INKY") == 0) s_row = 21, s_col = 22;
-                else if (strcmp(gObj->gName, "CLYDE") == 0) s_row = 21, s_col = 0;
+                else if (strcmp(gObj->gName, "BLINKY") == 0) s_row = 0, s_col = MAP_COL;
+                else if (strcmp(gObj->gName, "INKY") == 0) s_row = MAP_ROW, s_col = MAP_COL;
+                else if (strcmp(gObj->gName, "CLYDE") == 0) s_row = MAP_ROW, s_col = 0;
                 scatter_mood(gObj, tileSet, up, right, down, left, g_row, g_col, s_row, s_col);
             } else if (gObj->gMood == G_CHASE) {//Else if in chase mood
-                POINT next_move = shortest_path(gObj, tileSet, g_row, g_col, p_row, p_col);
+                int d_new_col = p_col, d_new_row = p_row;
+
+                //Implement chase mood of pinky
+                if (strcmp(gObj->gName, "PINKY") == 0) {
+                    pObj->pMove == SDLK_DOWN ? d_new_row += 4 : 0;
+                    pObj->pMove == SDLK_UP ? d_new_row -= 4 : 0;
+                    pObj->pMove == SDLK_RIGHT ? d_new_col += 4 : 0;
+                    pObj->pMove == SDLK_LEFT ? d_new_col -= 4 : 0;
+                } else if (strcmp(gObj->gName, "INKY") == 0) {//Implement chase mood of inky
+                    pObj->pMove == SDLK_DOWN ? d_new_row += 2 : 0;
+                    pObj->pMove == SDLK_UP ? d_new_row -= 2 : 0;
+                    pObj->pMove == SDLK_RIGHT ? d_new_col += 2 : 0;
+                    pObj->pMove == SDLK_LEFT ? d_new_col -= 2 : 0;
+                    d_new_col = ((blinky.gBox.x / 30)) + (2 * (d_new_col - (blinky.gBox.x / 30)));
+                    d_new_row = (blinky.gBox.y / 30) + (2 * (d_new_row - (blinky.gBox.y / 30)));
+                } else if (strcmp(gObj->gName, "CLYDE") == 0) {//Implement chase mood of clyde
+                    if (abs(g_col - p_col) <= 8 || abs(g_row - p_row) <= 8)d_new_row = 25, d_new_col = 0;
+                }
+                POINT next_move = shortest_path(gObj, tileSet, g_row, g_col, d_new_row, d_new_col);
                 if (next_move.pRow == g_row && next_move.pCol == g_col)
-                    scatter_mood(gObj, tileSet, up, right, down, left, g_row, g_col, p_row, p_col);
+                    scatter_mood(gObj, tileSet, up, right, down, left, g_row, g_col, d_new_row, d_new_col);
                 else if (next_move.pRow < g_row) gObj->gMove = G_UP;
                 else if (next_move.pRow > g_row) gObj->gMove = G_DOWN;
                 else if (next_move.pCol > g_col)gObj->gMove = G_RIGHT;
@@ -274,6 +292,12 @@ static bool is_smallest(int s, int num1, int num2, int num3) {
 static void
 scatter_mood(GHOST *gObj, Tile ***tileSet, int up, int right, int down, int left, int g_row, int g_col, int des_row,
              int des_col) {
+    //If out of tile
+    if (des_row < 0)des_row = 0;
+    if (des_row >= MAP_ROW)des_row = MAP_ROW - 1;
+    if (des_col < 0)des_col = 0;
+    if (des_col >= MAP_COL)des_col = MAP_COL - 1;
+
     //Don't allow ghost to get back
     up = up ? MAP_tile_distance(*tileSet[g_row - 1][g_col], *tileSet[des_row][des_col]) : -1;
     right = right ? MAP_tile_distance(*tileSet[g_row][g_col + 1], *tileSet[des_row][des_col]) : -1;

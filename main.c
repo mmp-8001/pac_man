@@ -22,11 +22,11 @@ int main(int argc, char *argv[]) {
 
     //Create pacman
     PACMAN pacMan;
-    PACMAN_init(&pacMan, 30, 30);
+    PACMAN_init(&pacMan, 30, 90);
 
     //Create ghosts
     GHOST pinky;
-    GHOST_init(&pinky, 30, 30, "PINKY");
+    GHOST_init(&pinky, 30, 90, "PINKY");
     GHOST blinky;
     GHOST_init(&blinky, 300, 300, "BLINKY");
     GHOST inky;
@@ -56,13 +56,13 @@ int main(int argc, char *argv[]) {
 
             //Ghosts logic
             GHOST_action(&pinky);
-            GHOST_move(&pinky, &pacMan, tileSet);
+            GHOST_move(&pinky, &pacMan, tileSet, blinky);
             GHOST_action(&blinky);
-            GHOST_move(&blinky, &pacMan, tileSet);
+            GHOST_move(&blinky, &pacMan, tileSet, blinky);
             GHOST_action(&inky);
-            GHOST_move(&inky, &pacMan, tileSet);
+            GHOST_move(&inky, &pacMan, tileSet, blinky);
             GHOST_action(&clyde);
-            GHOST_move(&clyde, &pacMan, tileSet);
+            GHOST_move(&clyde, &pacMan, tileSet, blinky);
         }
 
         //Clear screen

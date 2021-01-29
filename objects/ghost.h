@@ -34,6 +34,6 @@ extern void GHOST_render(GHOST *obj);
 extern void GHOST_action(GHOST *obj);
 
 //Extern ghost move to implement ghosts AI
-extern void GHOST_move(GHOST *gObj, PACMAN *pObj, Tile ***tileSet);
+extern void GHOST_move(GHOST *gObj, PACMAN *pObj, Tile ***tileSet, GHOST blinky);
 
 #endif //PAC_MAN_GHOST_H
