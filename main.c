@@ -3,6 +3,9 @@
 #include "objects/map.h"
 #include "objects/ghost.h"
 
+
+void start_intro(LTexture *intro, SDL_Event e);
+
 int main(int argc, char *argv[]) {
     if (!app_init()) {
         printf("Failed to initialize the app!\n");
@@ -12,13 +15,16 @@ int main(int argc, char *argv[]) {
     bool quit = false;
 
     //Pause flag
-    bool pause = false;
+    bool pause = true;
 
     //Create map
     Tile ***tileSet = MAP_init();
 
     //Event handler
     SDL_Event e;
+
+    LTexture intro;
+    start_intro(&intro, e);
 
     //Create pacman
     PACMAN pacMan;
@@ -28,7 +34,7 @@ int main(int argc, char *argv[]) {
     GHOST pinky;
     GHOST_init(&pinky, 30, 90, "PINKY");
     GHOST blinky;
-    GHOST_init(&blinky, 300, 300, "BLINKY");
+    GHOST_init(&blinky, 330, 300, "BLINKY");
     GHOST inky;
     GHOST_init(&inky, 510, 480, "INKY");
     GHOST clyde;
@@ -98,4 +104,41 @@ int main(int argc, char *argv[]) {
     app_close();
 
     return 0;
+}
+
+void start_intro(LTexture *intro, SDL_Event e) {
+    int alpha = 0;
+    LTexture_loadFromFile(intro, "../assets/intro.png");
+    bool start = false;
+
+    while (!start) {
+        while (SDL_PollEvent(&e) != 0) {
+            //User requests quit
+            if (e.type == SDL_QUIT) {
+                exit(0);
+            }
+            //If user press any key start game
+            if (e.type == SDL_KEYDOWN) {
+                start = true;
+            }
+        }
+
+        //Clear screen
+        SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
+        SDL_RenderClear(gRenderer);
+
+        //Set alpha and render intro pic
+        LTexture_set_alpha(intro, alpha);
+        LTexture_render(intro, SCREEN_WIDTH / 2 - intro->mWidth / 2, SCREEN_HEIGHT / 2 - intro->mHeight / 2, NULL, 0.0,
+                        NULL, SDL_FLIP_NONE);
+
+        //Faded animation simulation
+        if (alpha < 255) alpha++;
+
+        //Control faded animation speed
+        SDL_Delay(APP_DELAY);
+
+        //Update screen
+        SDL_RenderPresent(gRenderer);
+    }
 }

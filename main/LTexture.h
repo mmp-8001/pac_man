@@ -24,4 +24,7 @@ extern bool LTexture_loadFromFile(LTexture *obj, char *path);
 extern void
 LTexture_render(LTexture *obj, int x, int y, SDL_Rect *clip, double angle, SDL_Point *center, SDL_RendererFlip flip);
 
+//Extern set alpha function to set alpha channel
+extern void LTexture_set_alpha(LTexture *obj, int alpha);
+
 #endif //PAC_MAN_LTEXTURE_H

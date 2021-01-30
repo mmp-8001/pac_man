@@ -20,7 +20,7 @@ static bool out_of_map(SDL_Rect box);
 
 //Variables for app
 const int MAP_COL = 23;
-const int MAP_ROW = 22;
+const int MAP_ROW = 24;
 
 //Global variable for this file
 static const int TILE_WIDTH = 30;
@@ -85,7 +85,8 @@ extern Tile ***MAP_init() {
 //This function find proper tile type and it's angle according to wall in map
 static void get_tile_type(Tile *tile, int row, int col) {
     //Map simulator for testing
-    unsigned short int map[22][23] = {
+    unsigned short int map[24][23] = {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
             {0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0},
@@ -107,6 +108,7 @@ static void get_tile_type(Tile *tile, int row, int col) {
             {0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 0, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0},
             {0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0},
             {0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     };
 

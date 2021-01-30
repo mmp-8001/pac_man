@@ -64,3 +64,9 @@ LTexture_render(LTexture *obj, int x, int y, SDL_Rect *clip, double angle, SDL_P
     //Render to screen
     SDL_RenderCopyEx(gRenderer, obj->mTexture, clip, &renderQuad, angle, center, flip);
 }
+
+//This function set alpha channel for texture
+extern void LTexture_set_alpha(LTexture *obj, int alpha) {
+    //Modulate texture alpha
+    SDL_SetTextureAlphaMod(obj->mTexture, alpha);
+}
