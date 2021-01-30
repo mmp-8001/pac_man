@@ -10,6 +10,7 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_mixer.h"
+#include "SDL2/SDL_ttf.h"
 
 //Variable which want to use across all files
 extern const char gAppName[];
