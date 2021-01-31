@@ -11,4 +11,5 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 link_directories(${PROJECT_SOURCE_DIR}/lib)
 
 add_executable(pac_man ${SOURCE_FILES})
-target_link_libraries(pac_man mingw32 SDL2main SDL2 SDL2_image SDL2_mixer SDL2_ttf)
+find_library(libSDL_draw libSDL_draw lib)
+target_link_libraries(pac_man mingw32 SDL2main SDL2 SDL2_image SDL2_mixer SDL2_ttf ${libSDL_draw})

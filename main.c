@@ -2,6 +2,7 @@
 #include "objects/pacman.h"
 #include "objects/map.h"
 #include "objects/ghost.h"
+#include "SDL_draw.h"
 
 
 void start_intro(LTexture *intro, LTexture *textTexture, SDL_Event e);
@@ -24,7 +25,7 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
 
     //Introduction section
-    LTexture intro,textTexture;
+    LTexture intro, textTexture;
     start_intro(&intro, &textTexture, e);
 
     //Create pacman
@@ -108,7 +109,7 @@ int main(int argc, char *argv[]) {
 }
 
 void start_intro(LTexture *intro, LTexture *textTexture, SDL_Event e) {
-    int intro_alpha = 0, text_alpha = 80, counter = 4;
+    int intro_alpha = 0, text_alpha = 80, counter;
     bool start = false;
 
     //Render text
@@ -152,11 +153,11 @@ void start_intro(LTexture *intro, LTexture *textTexture, SDL_Event e) {
                         NULL, SDL_FLIP_NONE);
 
         //Faded animation simulation
-        if (intro_alpha < 255) intro_alpha++;
+        if (intro_alpha < 255 - INTRO_PIC_FADE_TIME) intro_alpha += INTRO_PIC_FADE_TIME;
 
         //Make text blinking
-        if (text_alpha >= 253) counter = -2;
-        if (text_alpha <= 80) counter = 2;
+        if (text_alpha >= 255 - INTRO_TEXT_FADE_TIME) counter = -INTRO_TEXT_FADE_TIME;
+        if (text_alpha <= 80) counter = INTRO_TEXT_FADE_TIME;
         text_alpha += counter;
 
         //Control faded animation speed
