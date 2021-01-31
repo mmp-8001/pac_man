@@ -11,6 +11,7 @@
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_mixer.h"
 #include "SDL2/SDL_ttf.h"
+#include "../main/LTexture.h"
 
 //Variable which want to use across all files
 extern const char gAppName[];
@@ -19,6 +20,8 @@ extern const int SCREEN_HEIGHT;
 extern const int APP_DELAY;
 extern SDL_Window *gWindow;
 extern SDL_Renderer *gRenderer;
+extern TTF_Font *gFont;
+extern SDL_Color gTextColor;
 
 //Extern app init to initialize our app
 extern bool app_init();

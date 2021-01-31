@@ -27,4 +27,7 @@ LTexture_render(LTexture *obj, int x, int y, SDL_Rect *clip, double angle, SDL_P
 //Extern set alpha function to set alpha channel
 extern void LTexture_set_alpha(LTexture *obj, int alpha);
 
+//Extern this function to build texture from text
+extern bool LTexture_FromRenderedText(LTexture *obj, char *textureText, SDL_Color textColor);
+
 #endif //PAC_MAN_LTEXTURE_H

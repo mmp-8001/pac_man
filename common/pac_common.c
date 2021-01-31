@@ -4,6 +4,9 @@
 
 #include "pac_common.h"
 
+//Functions prototype
+static bool load_font();
+
 //The name of our app
 const char gAppName[] = "PAC-MAN";
 
@@ -19,6 +22,12 @@ SDL_Window *gWindow = NULL;
 
 //The window renderer
 SDL_Renderer *gRenderer = NULL;
+
+//Globally used font
+TTF_Font *gFont = NULL;
+
+//Font color
+SDL_Color gTextColor = {255, 255, 255};
 
 //This function check lib, init SDL and SDL_Image, create renderer and window
 extern bool app_init() {
@@ -65,27 +74,46 @@ extern bool app_init() {
                 }
 
                 //Initialize SDL_ttf
-                if( TTF_Init() == -1 )
-                {
-                    printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
+                if (TTF_Init() == -1) {
+                    printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
                     success = false;
                 }
             }
         }
     }
+
+    //Load font
+    if (!load_font()) success = false;
+
     return success;
 }
 
 //This function close our application
 extern void app_close() {
     //Destroy window
-    SDL_DestroyRenderer(gRenderer);
     SDL_DestroyWindow(gWindow);
+    //Destroy renderer
+    SDL_DestroyRenderer(gRenderer);
+    //Destroy loaded font
+    TTF_CloseFont(gFont);
     gWindow = NULL;
     gRenderer = NULL;
+    gFont = NULL;
 
     //Quit SDL subsystems
     IMG_Quit();
     SDL_Quit();
     Mix_Quit();
+    TTF_Quit();
+}
+
+//This function load font
+static bool load_font() {
+    //Open the font
+    gFont = TTF_OpenFont("../assets/Emulogic-zrEw.ttf", 15);
+    if (gFont == NULL) {
+        printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+        return false;
+    }
+    return true;
 }

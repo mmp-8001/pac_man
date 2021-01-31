@@ -4,7 +4,7 @@
 #include "objects/ghost.h"
 
 
-void start_intro(LTexture *intro, SDL_Event e);
+void start_intro(LTexture *intro, LTexture *textTexture, SDL_Event e);
 
 int main(int argc, char *argv[]) {
     if (!app_init()) {
@@ -23,8 +23,9 @@ int main(int argc, char *argv[]) {
     //Event handler
     SDL_Event e;
 
-    LTexture intro;
-    start_intro(&intro, e);
+    //Introduction section
+    LTexture intro,textTexture;
+    start_intro(&intro, &textTexture, e);
 
     //Create pacman
     PACMAN pacMan;
@@ -106,10 +107,21 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void start_intro(LTexture *intro, SDL_Event e) {
-    int alpha = 0;
-    LTexture_loadFromFile(intro, "../assets/intro.png");
+void start_intro(LTexture *intro, LTexture *textTexture, SDL_Event e) {
+    int intro_alpha = 0, text_alpha = 80, counter = 4;
     bool start = false;
+
+    //Render text
+    if (!LTexture_FromRenderedText(textTexture, "PRESS ANY KEY TO START", gTextColor)) {
+        printf("Failed to render text texture!\n");
+        exit(1);
+    }
+
+    //Load introduction picture
+    if (!LTexture_loadFromFile(intro, "../assets/intro.png")) {
+        printf("Failed to load introduction image!\n");
+        exit(1);
+    }
 
     while (!start) {
         while (SDL_PollEvent(&e) != 0) {
@@ -128,12 +140,24 @@ void start_intro(LTexture *intro, SDL_Event e) {
         SDL_RenderClear(gRenderer);
 
         //Set alpha and render intro pic
-        LTexture_set_alpha(intro, alpha);
+        LTexture_set_alpha(intro, intro_alpha);
         LTexture_render(intro, SCREEN_WIDTH / 2 - intro->mWidth / 2, SCREEN_HEIGHT / 2 - intro->mHeight / 2, NULL, 0.0,
                         NULL, SDL_FLIP_NONE);
 
+
+        LTexture_set_alpha(textTexture, text_alpha);
+        LTexture_render(textTexture, SCREEN_WIDTH / 2 - textTexture->mWidth / 2, SCREEN_HEIGHT / 2 + intro->mHeight,
+                        NULL,
+                        0.0,
+                        NULL, SDL_FLIP_NONE);
+
         //Faded animation simulation
-        if (alpha < 255) alpha++;
+        if (intro_alpha < 255) intro_alpha++;
+
+        //Make text blinking
+        if (text_alpha >= 253) counter = -2;
+        if (text_alpha <= 80) counter = 2;
+        text_alpha += counter;
 
         //Control faded animation speed
         SDL_Delay(APP_DELAY);
@@ -141,4 +165,8 @@ void start_intro(LTexture *intro, SDL_Event e) {
         //Update screen
         SDL_RenderPresent(gRenderer);
     }
+
+    //Destroy texture
+    LTexture_free(intro);
+    LTexture_free(textTexture);
 }
