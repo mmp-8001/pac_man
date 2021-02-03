@@ -23,10 +23,9 @@ SDL_Window *gWindow = NULL;
 //The window renderer
 SDL_Renderer *gRenderer = NULL;
 
-//Globally used font
+//Font variables
 TTF_Font *gFont = NULL;
-
-//Font color
+static char *FONT_PATH = "../assets/ARCADE_R.ttf";
 SDL_Color gTextColor = {255, 255, 255};
 
 //This function check lib, init SDL and SDL_Image, create renderer and window
@@ -110,7 +109,7 @@ extern void app_close() {
 //This function load font
 static bool load_font() {
     //Open the font
-    gFont = TTF_OpenFont("../assets/Emulogic-zrEw.ttf", 15);
+    gFont = TTF_OpenFont(FONT_PATH, 15);
     if (gFont == NULL) {
         printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
         return false;

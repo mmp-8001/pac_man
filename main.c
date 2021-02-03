@@ -20,7 +20,8 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
 
     //Introduction section
-    TEXTURE intro,textTexture;
+    TEXTURE intro, textTexture;
+    TEXTURE_init(2, &intro, &textTexture);
     start_intro(&intro, &textTexture, e);
 
     //Create map
