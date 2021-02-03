@@ -27,6 +27,7 @@ static SDL_Rect PACMAN_SPRITE_CLIP[5];
 //This function create one pacman
 extern void PACMAN_init(PACMAN *obj, int posX, int posY) {
     create_status();
+    TEXTURE_init(1, &obj->pTexture);
     obj->pStatus = 0;
     obj->pAngle = 0;
     obj->pMove = PAC_RIGHT;

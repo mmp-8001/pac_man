@@ -12,8 +12,9 @@ static char BOX_PATH[] = "../assets/round_box.png";
 //This function create one button
 extern bool BUTTON_init(BUTTON *obj, char *text) {
     SDL_Rect dest;
-    SDL_Surface *button_border;
-    SDL_Surface *textSurface;
+    SDL_Surface *button_border = NULL;
+    SDL_Surface *textSurface = NULL;
+    obj->bTexture.mTexture = NULL;
 
     //Init button state to mouse out
     obj->state = BUTTON_MOUSE_OUT;
@@ -57,12 +58,14 @@ extern bool BUTTON_init(BUTTON *obj, char *text) {
             }
         }
     }
-
     //Get rid of surfaces
     SDL_FreeSurface(button_border);
     button_border = NULL;
     SDL_FreeSurface(textSurface);
     textSurface = NULL;
+
+    //Return success
+    return obj->bTexture.mTexture != NULL;
 }
 
 //This function handle button state
@@ -125,6 +128,7 @@ extern void BUTTON_terminate(BUTTON *obj) {
     TEXTURE_free(&obj->bTexture);
     obj = NULL;
 }
+
 //This function change color of button when hover on it
 extern void BUTTON_hover(BUTTON *obj) {
     //Modulate texture

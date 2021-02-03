@@ -55,6 +55,7 @@ int colNum[] = {0, -1, 1, 0};
 
 //This function create one ghost
 extern void GHOST_init(GHOST *obj, int posX, int posY, char name[]) {
+    TEXTURE_init(1, &obj->gTexture);
     char pic[30];
     //Get proper pic path according to ghost's name
     if (!proper_pic(pic, name)) {

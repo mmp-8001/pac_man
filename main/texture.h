@@ -6,6 +6,7 @@
 #define PAC_MAN_TEXTURE_H
 
 #include "../common/pac_common.h"
+#include <stdarg.h>
 
 //Our texture structure
 typedef struct {
