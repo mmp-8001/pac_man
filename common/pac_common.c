@@ -10,17 +10,12 @@ static bool load_font();
 //The name of our app
 const char gAppName[] = "PAC-MAN";
 
-//Intro section
-const int INTRO_TEXT_FADE_TIME = 2;
-const int INTRO_PIC_FADE_TIME = 2;
-
-
 //Screen dimension constants
 const int SCREEN_WIDTH = 690;
 const int SCREEN_HEIGHT = 720;
 
 //Control app speed
-const int APP_DELAY = 10;
+int const APP_DELAY = 10;
 
 //The window we'll be rendering to
 SDL_Window *gWindow = NULL;
