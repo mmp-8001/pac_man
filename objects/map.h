@@ -6,7 +6,7 @@
 #define PAC_MAN_MAP_H
 
 #include "../common/pac_common.h"
-#include "../main/LTexture.h"
+#include "../main/texture.h"
 
 //Variables for app
 extern const int MAP_ROW;

@@ -2,10 +2,10 @@
 // Created by mmp on 1/3/2021.
 //
 
-#include "LTexture.h"
+#include "texture.h"
 
 //This function clear memory and deallocate
-extern void LTexture_free(LTexture *obj) {
+extern void TEXTURE_free(LTexture *obj) {
     //Free texture if it exists
     if (obj->mTexture != NULL) {
         SDL_DestroyTexture(obj->mTexture);
@@ -16,9 +16,9 @@ extern void LTexture_free(LTexture *obj) {
 }
 
 //This function load surface from specified file
-extern bool LTexture_loadFromFile(LTexture *obj, char *path) {
+extern bool TEXTURE_loadFromFile(LTexture *obj, char *path) {
     //Free up if we have data in that chunk of memory
-    LTexture_free(obj);
+    TEXTURE_free(obj);
 
     //The final texture
     SDL_Texture *newTexture = NULL;
@@ -51,7 +51,7 @@ extern bool LTexture_loadFromFile(LTexture *obj, char *path) {
 
 //This function render our loaded surface to window
 extern void
-LTexture_render(LTexture *obj, int x, int y, SDL_Rect *clip, double angle, SDL_Point *center, SDL_RendererFlip flip) {
+TEXTURE_render(LTexture *obj, int x, int y, SDL_Rect *clip, double angle, SDL_Point *center, SDL_RendererFlip flip) {
     //Set rendering space and render to screen
     SDL_Rect renderQuad = {x, y, obj->mWidth, obj->mHeight};
 
@@ -66,15 +66,15 @@ LTexture_render(LTexture *obj, int x, int y, SDL_Rect *clip, double angle, SDL_P
 }
 
 //This function set alpha channel for texture
-extern void LTexture_set_alpha(LTexture *obj, int alpha) {
+extern void TEXTURE_set_alpha(LTexture *obj, int alpha) {
     //Modulate texture alpha
     SDL_SetTextureAlphaMod(obj->mTexture, alpha);
 }
 
 //This function make texture from text
-extern bool LTexture_FromRenderedText(LTexture *obj, char *textureText, SDL_Color textColor) {
+extern bool TEXTURE_FromRenderedText(LTexture *obj, char *textureText, SDL_Color textColor) {
     //Get rid of preexisting texture
-    LTexture_free(obj);
+    TEXTURE_free(obj);
 
     //Render text surface
     SDL_Surface *textSurface = TTF_RenderText_Solid(gFont, textureText, textColor);

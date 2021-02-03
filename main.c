@@ -1,6 +1,5 @@
 #include "common/pac_common.h"
 #include "objects/pacman.h"
-#include "objects/map.h"
 #include "objects/ghost.h"
 
 
@@ -17,15 +16,15 @@ int main(int argc, char *argv[]) {
     //Pause flag
     bool pause = true;
 
-    //Create map
-    Tile ***tileSet = MAP_init();
-
     //Event handler
     SDL_Event e;
 
     //Introduction section
     LTexture intro,textTexture;
     start_intro(&intro, &textTexture, e);
+
+    //Create map
+    Tile ***tileSet = MAP_init();
 
     //Create pacman
     PACMAN pacMan;
@@ -112,13 +111,13 @@ void start_intro(LTexture *intro, LTexture *textTexture, SDL_Event e) {
     bool start = false;
 
     //Render text
-    if (!LTexture_FromRenderedText(textTexture, "PRESS ANY KEY TO START", gTextColor)) {
+    if (!TEXTURE_FromRenderedText(textTexture, "PRESS ANY KEY TO START", gTextColor)) {
         printf("Failed to render text texture!\n");
         exit(1);
     }
 
     //Load introduction picture
-    if (!LTexture_loadFromFile(intro, "../assets/intro.png")) {
+    if (!TEXTURE_loadFromFile(intro, "../assets/intro.png")) {
         printf("Failed to load introduction image!\n");
         exit(1);
     }
@@ -140,16 +139,16 @@ void start_intro(LTexture *intro, LTexture *textTexture, SDL_Event e) {
         SDL_RenderClear(gRenderer);
 
         //Set alpha and render intro pic
-        LTexture_set_alpha(intro, intro_alpha);
-        LTexture_render(intro, SCREEN_WIDTH / 2 - intro->mWidth / 2, SCREEN_HEIGHT / 2 - intro->mHeight / 2, NULL, 0.0,
-                        NULL, SDL_FLIP_NONE);
+        TEXTURE_set_alpha(intro, intro_alpha);
+        TEXTURE_render(intro, SCREEN_WIDTH / 2 - intro->mWidth / 2, SCREEN_HEIGHT / 2 - intro->mHeight / 2, NULL, 0.0,
+                       NULL, SDL_FLIP_NONE);
 
 
-        LTexture_set_alpha(textTexture, text_alpha);
-        LTexture_render(textTexture, SCREEN_WIDTH / 2 - textTexture->mWidth / 2, SCREEN_HEIGHT / 2 + intro->mHeight,
-                        NULL,
-                        0.0,
-                        NULL, SDL_FLIP_NONE);
+        TEXTURE_set_alpha(textTexture, text_alpha);
+        TEXTURE_render(textTexture, SCREEN_WIDTH / 2 - textTexture->mWidth / 2, SCREEN_HEIGHT / 2 + intro->mHeight,
+                       NULL,
+                       0.0,
+                       NULL, SDL_FLIP_NONE);
 
         //Faded animation simulation
         if (intro_alpha < 255) intro_alpha++;
@@ -167,6 +166,6 @@ void start_intro(LTexture *intro, LTexture *textTexture, SDL_Event e) {
     }
 
     //Destroy texture
-    LTexture_free(intro);
-    LTexture_free(textTexture);
+    TEXTURE_free(intro);
+    TEXTURE_free(textTexture);
 }

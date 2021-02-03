@@ -164,7 +164,7 @@ static void get_tile_type(Tile *tile, int row, int col) {
 //This function Load tile texture and clip that texture to gain proper section
 static void create_tile() {
     //Load tile texture
-    if (!LTexture_loadFromFile(&gTileTexture, TILES_PIC)) {
+    if (!TEXTURE_loadFromFile(&gTileTexture, TILES_PIC)) {
         printf("Failed to load tile set texture!\n");
         exit(0);
     }
@@ -231,8 +231,8 @@ extern void MAP_render(Tile ***tileSet) {
 static void tile_render(Tile *obj) {
     short int x = 0;
     if (obj->mType == TILE_WALL_PARALLEL || obj->mType == TILE_WALL_LINE || obj->mType == TILE_WALL_ROUND)x = 1;
-    LTexture_render(&gTileTexture, obj->mBox.x - x, obj->mBox.y, &gTileClips[obj->mType], obj->mAngle, NULL,
-                    SDL_FLIP_NONE);
+    TEXTURE_render(&gTileTexture, obj->mBox.x - x, obj->mBox.y, &gTileClips[obj->mType], obj->mAngle, NULL,
+                   SDL_FLIP_NONE);
 }
 
 //Checks collision box against box
@@ -331,7 +331,7 @@ extern void MAP_terminate(Tile ***tileSet) {
         tileSet = NULL;
     }
     //Free tile texture
-    LTexture_free(&gTileTexture);
+    TEXTURE_free(&gTileTexture);
     gTileTexture.mTexture = NULL;
 
     //Free munch audio

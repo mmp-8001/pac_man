@@ -5,8 +5,8 @@
 #ifndef PAC_MAN_PACMAN_H
 #define PAC_MAN_PACMAN_H
 
-#include "SDL2/SDL.h"
-#include "../main/LTexture.h"
+#include "../common/pac_common.h"
+#include "../main/texture.h"
 #include "../objects/map.h"
 
 //Properties of pacman

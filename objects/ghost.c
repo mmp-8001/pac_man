@@ -75,7 +75,7 @@ extern void GHOST_init(GHOST *obj, int posX, int posY, char name[]) {
     obj->gTexture.mTexture = NULL;
     obj->gTexture.mHeight = 0;
     obj->gTexture.mWidth = 0;
-    LTexture_loadFromFile(&obj->gTexture, pic);
+    TEXTURE_loadFromFile(&obj->gTexture, pic);
 }
 
 //This function get proper pic path according to ghost's name
@@ -90,14 +90,14 @@ static bool proper_pic(char pic[], char name[]) {
 
 //This function terminate ghost
 extern void GHOST_terminate(GHOST *obj) {
-    LTexture_free(&obj->gTexture);
+    TEXTURE_free(&obj->gTexture);
     obj = NULL;
 }
 
 //This function render ghost to window
 extern void GHOST_render(GHOST *obj) {
-    LTexture_render(&obj->gTexture, obj->gBox.x, obj->gBox.y, &GHOST_SPRITE_CLIP[obj->gStatus], 0.0, NULL,
-                    SDL_FLIP_NONE);
+    TEXTURE_render(&obj->gTexture, obj->gBox.x, obj->gBox.y, &GHOST_SPRITE_CLIP[obj->gStatus], 0.0, NULL,
+                   SDL_FLIP_NONE);
 }
 
 //This function make ghost alive

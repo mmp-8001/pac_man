@@ -36,19 +36,19 @@ extern void PACMAN_init(PACMAN *obj, int posX, int posY) {
     obj->pBox.w = PACMAN_WIDTH;
     obj->pBox.h = PACMAN_HEIGHT;
     obj->pFlipType = SDL_FLIP_NONE;
-    LTexture_loadFromFile(&obj->pTexture, PACMAN_PIC);
+    TEXTURE_loadFromFile(&obj->pTexture, PACMAN_PIC);
 }
 
 //This function terminate pacman
 extern void PACMAN_terminate(PACMAN *obj) {
-    LTexture_free(&obj->pTexture);
+    TEXTURE_free(&obj->pTexture);
     obj = NULL;
 }
 
 //This function render pacman to window
 extern void PACMAN_render(PACMAN *obj) {
-    LTexture_render(&obj->pTexture, obj->pBox.x, obj->pBox.y, &PACMAN_SPRITE_CLIP[obj->pStatus], obj->pAngle, NULL,
-                    obj->pFlipType);
+    TEXTURE_render(&obj->pTexture, obj->pBox.x, obj->pBox.y, &PACMAN_SPRITE_CLIP[obj->pStatus], obj->pAngle, NULL,
+                   obj->pFlipType);
 }
 
 //This function make pacman alive
