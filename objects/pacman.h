@@ -15,7 +15,7 @@ typedef struct {
     int pAngle;
     int pVelocity;
     int pMove;
-    LTexture pTexture;
+    TEXTURE pTexture;
     SDL_Rect pBox;
     SDL_RendererFlip pFlipType;
 } PACMAN;

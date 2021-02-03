@@ -27,7 +27,7 @@ static const int TILE_WIDTH = 30;
 static const int TILE_HEIGHT = 30;
 static char TILES_PIC[] = "../assets/tiles.png";
 static SDL_Rect gTileClips[8];
-static LTexture gTileTexture;
+static TEXTURE gTileTexture;
 static Mix_Chunk *gPacmanMunch = NULL;
 
 //This function initialize map

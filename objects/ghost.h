@@ -17,7 +17,7 @@ typedef struct {
     int gMove;
     int gMood;
     char gName[10];
-    LTexture gTexture;
+    TEXTURE gTexture;
     SDL_Rect gBox;
 } GHOST;
 

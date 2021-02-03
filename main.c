@@ -3,7 +3,7 @@
 #include "objects/ghost.h"
 
 
-void start_intro(LTexture *intro, LTexture *textTexture, SDL_Event e);
+void start_intro(TEXTURE *intro, TEXTURE *textTexture, SDL_Event e);
 
 int main(int argc, char *argv[]) {
     if (!app_init()) {
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
 
     //Introduction section
-    LTexture intro,textTexture;
+    TEXTURE intro,textTexture;
     start_intro(&intro, &textTexture, e);
 
     //Create map
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void start_intro(LTexture *intro, LTexture *textTexture, SDL_Event e) {
+void start_intro(TEXTURE *intro, TEXTURE *textTexture, SDL_Event e) {
     int intro_alpha = 0, text_alpha = 80, counter = 4;
     bool start = false;
 
