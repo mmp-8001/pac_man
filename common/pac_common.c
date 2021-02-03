@@ -28,6 +28,10 @@ TTF_Font *gFont = NULL;
 static char *FONT_PATH = "../assets/ARCADE_R.ttf";
 SDL_Color gTextColor = {255, 255, 255};
 
+//Button color
+SDL_Color BUTTON_ON_HOVER_COLOR = {255, 255, 255};
+SDL_Color BUTTON_COLOR = {100, 100, 100};
+
 //This function check lib, init SDL and SDL_Image, create renderer and window
 extern bool app_init() {
     //Initialization flag

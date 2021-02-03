@@ -29,7 +29,7 @@ extern SDL_Surface *SURFACE_scale(SDL_Surface *loadedSurface, double scaleW, dou
         targetDimensions.w = (int) (width * scaleW);
         targetDimensions.h = (int) (height * scaleH);
 
-        // create a 32 bits per pixel surface to Blit the image to first, before BlitScaled
+        //Create a 32 bits per pixel surface to Blit the image to first, before BlitScaled
         SDL_Surface *p32BPPSurface = SDL_CreateRGBSurface(
                 loadedSurface->flags,
                 sourceDimensions.w,
@@ -43,7 +43,7 @@ extern SDL_Surface *SURFACE_scale(SDL_Surface *loadedSurface, double scaleW, dou
         if (SDL_BlitSurface(loadedSurface, NULL, p32BPPSurface, NULL) < 0) {
             printf("Error did not blit surface: %s\n", SDL_GetError());
         } else {
-            // create another 32 bits per pixel surface are the desired scale
+            //Create another 32 bits per pixel surface are the desired scale
             SDL_Surface *pScaleSurface = SDL_CreateRGBSurface(
                     p32BPPSurface->flags,
                     targetDimensions.w,

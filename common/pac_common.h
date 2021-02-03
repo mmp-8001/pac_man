@@ -21,6 +21,8 @@ extern SDL_Window *gWindow;
 extern SDL_Renderer *gRenderer;
 extern TTF_Font *gFont;
 extern SDL_Color gTextColor;
+extern SDL_Color BUTTON_ON_HOVER_COLOR;
+extern SDL_Color BUTTON_COLOR;
 
 //Extern app init to initialize our app
 extern bool app_init();
