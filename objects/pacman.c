@@ -7,6 +7,8 @@
 //Prototype for this file functions
 static void create_status();
 
+static bool pacman_touch_ghost(SDL_Rect pac, SDL_Rect ghost);
+
 //Enum for pacman move
 enum PACMAN_MOVE {
     PAC_UP = SDLK_UP, PAC_DOWN = SDLK_DOWN, PAC_RIGHT = SDLK_RIGHT, PAC_LEFT = SDLK_LEFT
@@ -245,7 +247,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
 }
 
 //This function move pacman according to it's direction
-extern void PACMAN_move(PACMAN *obj, Tile ***tileSet) {
+extern void PACMAN_move(PACMAN *obj, Tile ***tileSet, SDL_Rect a, SDL_Rect b, SDL_Rect c, SDL_Rect d) {
     int vel = obj->pVelocity;
     switch (obj->pMove) {
         //If want to go up
@@ -286,6 +288,26 @@ extern void PACMAN_move(PACMAN *obj, Tile ***tileSet) {
     }
     //Check if pacman touches seed
     MAP_touches_seed(obj->pBox, tileSet);
+
+    //Check if pacman touches ghosts
+    if (pacman_touch_ghost(obj->pBox, a) || pacman_touch_ghost(obj->pBox, b) ||
+        pacman_touch_ghost(obj->pBox, c) || pacman_touch_ghost(obj->pBox, d))
+        printf("bang");
+}
+
+static bool pacman_touch_ghost(SDL_Rect pac, SDL_Rect ghost) {
+    int p_col, p_row, g_col, g_row;
+    //Get current position of pacman
+    p_col = (pac.x + 15) / pac.w;
+    p_row = (pac.y + 15) / pac.h;
+
+    //Get current position of ghost
+    g_col = (ghost.x + 15) / ghost.w;
+    g_row = (ghost.y + 15) / ghost.h;
+
+    //If seed in current position eat that
+    if (g_col == p_col && g_row == p_row) return true;
+    return false;
 }
 
 //This function create different status of pacman

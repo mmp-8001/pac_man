@@ -5,11 +5,13 @@
 
 //Define game status
 typedef enum {
-    PAUSED_STATE, QUIT_STATE, RESUME, QUIT
+    PAUSED_STATE, QUIT_STATE, RESTART, KILLED, PLAYING, QUIT
 } GAME_STATUS;
 
 
 //Prototype of our functions
+void start_game();
+
 void start_intro(TEXTURE *intro, TEXTURE *textTexture, SDL_Event e);
 
 void pause_load(TEXTURE *paused_text, TEXTURE *quit_text);
@@ -22,12 +24,23 @@ int get_center_x(int w);
 int get_center_y(int h);
 
 int main(int argc, char *argv[]) {
+    //Init app and check dependencies
     if (!app_init()) {
         printf("Failed to initialize the app!\n");
         return 1;
     }
+    //Start game
+    start_game();
+
+    //Close game and destroy objects
+    app_close();
+
+    return 0;
+}
+
+void start_game() {
     //Main loop flag
-    GAME_STATUS status = RESUME;
+    GAME_STATUS status = RESTART;
 
     //Event handler
     SDL_Event e;
@@ -47,83 +60,93 @@ int main(int argc, char *argv[]) {
     if (!BUTTON_init(&no_box, "NO"))status = QUIT;
     pause_load(&paused_text, &quit_text);
 
-    //Create map
-    Tile ***tileSet = MAP_init();
+    while (status == RESTART) {
+        //Create map
+        Tile ***tileSet = MAP_init();
 
-    //Create pacman
-    PACMAN pacMan;
-    PACMAN_init(&pacMan, 30, 90);
+        status = KILLED;
 
-    //Create ghosts
-    GHOST pinky;
-    GHOST_init(&pinky, 30, 90, "PINKY");
-    GHOST blinky;
-    GHOST_init(&blinky, 330, 300, "BLINKY");
-    GHOST inky;
-    GHOST_init(&inky, 510, 480, "INKY");
-    GHOST clyde;
-    GHOST_init(&clyde, 30, 480, "CLYDE");
+        while (status == KILLED) {
+            //Create pacman
+            PACMAN pacMan;
+            PACMAN_init(&pacMan, 30, 90);
 
-    //Main loop, While application is running
-    while (status == RESUME) {
-        //Handle events on queue
-        while (SDL_PollEvent(&e) != 0) {
-            //User requests quit
-            if (e.type == SDL_QUIT) {
-                status = QUIT;
-            }
-            if (e.type == SDL_KEYDOWN) {
-                if (e.key.keysym.sym == SDLK_ESCAPE) {
-                    status = PAUSED_STATE;
-                    pause(&paused_text, &quit_text, &resume_box, &quit_box, &yes_box, &no_box, &e, &status);
+            //Create ghosts
+            GHOST pinky;
+            GHOST_init(&pinky, 30, 90, "PINKY");
+            GHOST blinky;
+            GHOST_init(&blinky, 330, 300, "BLINKY");
+            GHOST inky;
+            GHOST_init(&inky, 510, 480, "INKY");
+            GHOST clyde;
+            GHOST_init(&clyde, 30, 480, "CLYDE");
+
+            status = PLAYING;
+
+            //Main loop, While application is running
+            while (status == PLAYING) {
+                //Handle events on queue
+                while (SDL_PollEvent(&e) != 0) {
+                    //User requests quit
+                    if (e.type == SDL_QUIT) {
+                        status = QUIT;
+                    }
+                    if (e.type == SDL_KEYDOWN) {
+                        if (e.key.keysym.sym == SDLK_ESCAPE) {
+                            status = PAUSED_STATE;
+                            pause(&paused_text, &quit_text, &resume_box, &quit_box, &yes_box, &no_box, &e, &status);
+                        }
+                        if (e.key.keysym.sym == SDLK_F1) status = RESTART;
+                        if (e.key.keysym.sym == SDLK_F2) status = KILLED;
+                    }
                 }
+                //Pacman logic
+                PACMAN_handle(&pacMan, tileSet, e);
+                PACMAN_action(&pacMan);
+                PACMAN_move(&pacMan, tileSet, pinky.gBox, inky.gBox, clyde.gBox, blinky.gBox);
+
+                //Ghosts logic
+                GHOST_action(&pinky);
+                GHOST_move(&pinky, &pacMan, tileSet, blinky);
+                GHOST_action(&blinky);
+                GHOST_move(&blinky, &pacMan, tileSet, blinky);
+                GHOST_action(&inky);
+                GHOST_move(&inky, &pacMan, tileSet, blinky);
+                GHOST_action(&clyde);
+                GHOST_move(&clyde, &pacMan, tileSet, blinky);
+
+                //Clear screen
+                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
+                SDL_RenderClear(gRenderer);
+
+                //Render map
+                MAP_render(tileSet);
+
+                //Render pacman to window
+                PACMAN_render(&pacMan);
+
+                //Render ghosts
+                GHOST_render(&pinky);
+                GHOST_render(&blinky);
+                GHOST_render(&inky);
+                GHOST_render(&clyde);
+
+                //Control speed of app
+                SDL_Delay(APP_DELAY);
+
+                //Update screen
+                SDL_RenderPresent(gRenderer);
             }
+
+            //Destroy all objects in app
+            PACMAN_terminate(&pacMan);
+            GHOST_terminate(&pinky);
+            GHOST_terminate(&blinky);
+            GHOST_terminate(&inky);
+            GHOST_terminate(&clyde);
         }
-        //Pacman logic
-        PACMAN_handle(&pacMan, tileSet, e);
-        PACMAN_action(&pacMan);
-        PACMAN_move(&pacMan, tileSet);
-
-        //Ghosts logic
-        GHOST_action(&pinky);
-        GHOST_move(&pinky, &pacMan, tileSet, blinky);
-        GHOST_action(&blinky);
-        GHOST_move(&blinky, &pacMan, tileSet, blinky);
-        GHOST_action(&inky);
-        GHOST_move(&inky, &pacMan, tileSet, blinky);
-        GHOST_action(&clyde);
-        GHOST_move(&clyde, &pacMan, tileSet, blinky);
-
-        //Clear screen
-        SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
-        SDL_RenderClear(gRenderer);
-
-        //Render map
-        MAP_render(tileSet);
-
-        //Render pacman to window
-        PACMAN_render(&pacMan);
-
-        //Render ghosts
-        GHOST_render(&pinky);
-        GHOST_render(&blinky);
-        GHOST_render(&inky);
-        GHOST_render(&clyde);
-
-        //Control speed of app
-        SDL_Delay(APP_DELAY);
-
-        //Update screen
-        SDL_RenderPresent(gRenderer);
+        MAP_terminate(tileSet);
     }
-
-    //Destroy all objects in app
-    PACMAN_terminate(&pacMan);
-    GHOST_terminate(&pinky);
-    GHOST_terminate(&blinky);
-    GHOST_terminate(&inky);
-    GHOST_terminate(&clyde);
-    MAP_terminate(tileSet);
     TEXTURE_free(&intro);
     TEXTURE_free(&textTexture);
     TEXTURE_free(&paused_text);
@@ -132,9 +155,6 @@ int main(int argc, char *argv[]) {
     BUTTON_terminate(&quit_box);
     BUTTON_terminate(&yes_box);
     BUTTON_terminate(&no_box);
-    app_close();
-
-    return 0;
 }
 
 //Implement start section of game
@@ -228,7 +248,7 @@ void pause(TEXTURE *paused_text, TEXTURE *quit_text, BUTTON *resume_box, BUTTON 
             }
             //If user press escape resume game
             if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_ESCAPE) {
-                *game_status = RESUME;
+                *game_status = PLAYING;
             }
             //If we were in paused state
             if (*game_status == PAUSED_STATE) {
@@ -244,7 +264,7 @@ void pause(TEXTURE *paused_text, TEXTURE *quit_text, BUTTON *resume_box, BUTTON 
 
                 //Change state if click on each button
                 if (quit_box->state == BUTTON_MOUSE_UP) *game_status = QUIT_STATE;
-                else if (resume_box->state == BUTTON_MOUSE_UP)*game_status = RESUME;
+                else if (resume_box->state == BUTTON_MOUSE_UP)*game_status = PLAYING;
             } else if (*game_status == QUIT_STATE) {
                 //Handle state of button
                 BUTTON_handle(no_box, e);
