@@ -69,7 +69,7 @@ void start_game() {
         while (status == KILLED) {
             //Create pacman
             PACMAN pacMan;
-            PACMAN_init(&pacMan, 30, 90);
+            PACMAN_init(&pacMan, 150, 90);
 
             //Create ghosts
             GHOST pinky;
@@ -97,13 +97,12 @@ void start_game() {
                             pause(&paused_text, &quit_text, &resume_box, &quit_box, &yes_box, &no_box, &e, &status);
                         }
                         if (e.key.keysym.sym == SDLK_F1) status = RESTART;
-                        if (e.key.keysym.sym == SDLK_F2) status = KILLED;
                     }
                 }
                 //Pacman logic
                 PACMAN_handle(&pacMan, tileSet, e);
                 PACMAN_action(&pacMan);
-                PACMAN_move(&pacMan, tileSet, pinky.gBox, inky.gBox, clyde.gBox, blinky.gBox);
+                PACMAN_move(&pacMan, tileSet);
 
                 //Ghosts logic
                 GHOST_action(&pinky);
@@ -136,6 +135,8 @@ void start_game() {
 
                 //Update screen
                 SDL_RenderPresent(gRenderer);
+
+                if (PACMAN_killed(&pacMan, tileSet, pinky.gBox, inky.gBox, clyde.gBox, blinky.gBox))status = KILLED;
             }
 
             //Destroy all objects in app

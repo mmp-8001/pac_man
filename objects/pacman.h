@@ -36,6 +36,9 @@ extern void PACMAN_action(PACMAN *obj);
 extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e);
 
 //Extern pacman move to move pacman according to it's direction
-extern void PACMAN_move(PACMAN *obj, Tile ***tileSet, SDL_Rect a, SDL_Rect b, SDL_Rect c, SDL_Rect d);
+extern void PACMAN_move(PACMAN *obj, Tile ***tileSet);
+
+//Extern this function to implement pacman die animation
+extern bool PACMAN_killed(PACMAN *pac, Tile ***tileSet, SDL_Rect a, SDL_Rect b, SDL_Rect c, SDL_Rect d);
 
 #endif //PAC_MAN_PACMAN_H

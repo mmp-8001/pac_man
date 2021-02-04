@@ -9,6 +9,8 @@ static void create_status();
 
 static bool pacman_touch_ghost(SDL_Rect pac, SDL_Rect ghost);
 
+static void load_audio();
+
 //Enum for pacman move
 enum PACMAN_MOVE {
     PAC_UP = SDLK_UP, PAC_DOWN = SDLK_DOWN, PAC_RIGHT = SDLK_RIGHT, PAC_LEFT = SDLK_LEFT
@@ -24,6 +26,7 @@ static const int PACMAN_NEXT_MOVE = 45;
 static const int PACMAN_SOFT = 5;
 static char PACMAN_PIC[] = "../assets/pacman.png";
 static SDL_Rect PACMAN_SPRITE_CLIP[5];
+static Mix_Chunk *PAC_MAN_DIE_AUDIO = NULL;
 
 
 //This function create one pacman
@@ -40,12 +43,19 @@ extern void PACMAN_init(PACMAN *obj, int posX, int posY) {
     obj->pBox.h = PACMAN_HEIGHT;
     obj->pFlipType = SDL_FLIP_NONE;
     TEXTURE_loadFromFile(&obj->pTexture, PACMAN_PIC);
+
+    //load die audio
+    load_audio();
 }
 
 //This function terminate pacman
 extern void PACMAN_terminate(PACMAN *obj) {
     TEXTURE_free(&obj->pTexture);
     obj = NULL;
+
+    //Free die audio
+    Mix_FreeChunk(PAC_MAN_DIE_AUDIO);
+    PAC_MAN_DIE_AUDIO = NULL;
 }
 
 //This function render pacman to window
@@ -247,7 +257,7 @@ extern void PACMAN_handle(PACMAN *obj, Tile ***tileSet, SDL_Event e) {
 }
 
 //This function move pacman according to it's direction
-extern void PACMAN_move(PACMAN *obj, Tile ***tileSet, SDL_Rect a, SDL_Rect b, SDL_Rect c, SDL_Rect d) {
+extern void PACMAN_move(PACMAN *obj, Tile ***tileSet) {
     int vel = obj->pVelocity;
     switch (obj->pMove) {
         //If want to go up
@@ -288,13 +298,9 @@ extern void PACMAN_move(PACMAN *obj, Tile ***tileSet, SDL_Rect a, SDL_Rect b, SD
     }
     //Check if pacman touches seed
     MAP_touches_seed(obj->pBox, tileSet);
-
-    //Check if pacman touches ghosts
-    if (pacman_touch_ghost(obj->pBox, a) || pacman_touch_ghost(obj->pBox, b) ||
-        pacman_touch_ghost(obj->pBox, c) || pacman_touch_ghost(obj->pBox, d))
-        printf("bang");
 }
 
+//This function check if touch ghost
 static bool pacman_touch_ghost(SDL_Rect pac, SDL_Rect ghost) {
     int p_col, p_row, g_col, g_row;
     //Get current position of pacman
@@ -341,4 +347,48 @@ static void create_status() {
     PACMAN_SPRITE_CLIP[4].y = 0;
     PACMAN_SPRITE_CLIP[4].w = 30;
     PACMAN_SPRITE_CLIP[4].h = 30;
+}
+
+//This function implement pacman die animation
+extern bool PACMAN_killed(PACMAN *pac, Tile ***tileSet, SDL_Rect a, SDL_Rect b, SDL_Rect c, SDL_Rect d) {
+    bool animation = true;
+    int s_counter = 0, angel = 0;
+
+    //Check if pacman touches ghosts
+    if (!pacman_touch_ghost(pac->pBox, a) && !pacman_touch_ghost(pac->pBox, b) &&
+        !pacman_touch_ghost(pac->pBox, c) && !pacman_touch_ghost(pac->pBox, d))
+        return false;
+
+    Mix_PlayChannel(-1, PAC_MAN_DIE_AUDIO, 0);
+    while (animation) {
+        //Clear screen
+        SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
+        SDL_RenderClear(gRenderer);
+
+        //Render map
+        MAP_render(tileSet);
+        angel += 10;
+        pac->pAngle = angel % 270;
+        PACMAN_render(pac);
+
+        //Control faded animation speed
+        SDL_Delay(APP_DELAY);
+
+        //Update screen
+        SDL_RenderPresent(gRenderer);
+
+        //Be in this loop
+        if (s_counter++ == 150) animation = false;
+    }
+    return true;
+}
+
+//This function load audio in map
+static void load_audio() {
+    //Load audio
+    PAC_MAN_DIE_AUDIO = Mix_LoadWAV("../assets/pac_die.wav");
+    if (PAC_MAN_DIE_AUDIO == NULL) {
+        printf("Failed to load munch audio! SDL_mixer Error: %s\n", Mix_GetError());
+        exit(1);
+    }
 }
