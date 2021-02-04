@@ -19,6 +19,8 @@ void pause_load(TEXTURE *paused_text, TEXTURE *quit_text);
 void pause(TEXTURE *paused_text, TEXTURE *quit_text, BUTTON *resume_box, BUTTON *quit_box, BUTTON *yes_box,
            BUTTON *no_box, SDL_Event *e, GAME_STATUS *game_status);
 
+void set_score_texture(TEXTURE *score);
+
 int get_center_x(int w);
 
 int get_center_y(int h);
@@ -65,12 +67,15 @@ void start_game() {
     TEXTURE_init(1, &heart);
     TEXTURE_loadFromFile(&heart, "../assets/heart.png");
 
+    //Score loaded section
+    TEXTURE score;
+    TEXTURE_init(1, &score);
+
     while (status == RESTART) {
         //Create map
         Tile ***tileSet = MAP_init();
 
         status = KILLED;
-
         while (status == KILLED) {
             //Create pacman
             PACMAN pacMan;
@@ -137,6 +142,10 @@ void start_game() {
                 //Render pacman life
                 MAP_life_render(&heart);
 
+                //Set score texture
+                set_score_texture(&score);
+                TEXTURE_render_ord(&score, 30, 25);
+
                 //Control speed of app
                 SDL_Delay(APP_DELAY);
 
@@ -144,7 +153,14 @@ void start_game() {
                 SDL_RenderPresent(gRenderer);
 
                 if (PACMAN_killed(&pacMan, tileSet, pinky.gBox, inky.gBox, clyde.gBox, blinky.gBox))status = KILLED;
-                if (PACMAN_LIFE == 0)status = RESTART;
+                if (PACMAN_LIFE == 0) {
+                    printf("FUCKING LOOSER");
+                    status = RESTART;
+                }
+                if (GAME_CURRENT_SCORE == GAME_SCORE) {
+                    printf("WON");
+                    status = RESTART;
+                };
             }
 
             //Destroy all objects in app
@@ -165,6 +181,7 @@ void start_game() {
     BUTTON_terminate(&yes_box);
     BUTTON_terminate(&no_box);
     TEXTURE_free(&heart);
+    TEXTURE_free(&score);
 }
 
 //Implement start section of game
@@ -326,6 +343,21 @@ void pause(TEXTURE *paused_text, TEXTURE *quit_text, BUTTON *resume_box, BUTTON 
         //Update screen
         SDL_RenderPresent(gRenderer);
     }
+}
+
+//Set score texture
+void set_score_texture(TEXTURE *score) {
+    static int last = 0;
+    if (score->mTexture == NULL || last != GAME_CURRENT_SCORE) {
+        TEXTURE_free(score);
+        char str[80] = "SCORE: ", str_num[5];
+        strcat(str, itoa(GAME_CURRENT_SCORE, str_num, 10));
+        //Render score text
+        if (!TEXTURE_FromRenderedText(score, str, gTextColor)) {
+            printf("Failed to render text texture!\n");
+        }
+    }
+    last = GAME_CURRENT_SCORE;
 }
 
 //Place object in center of x axis

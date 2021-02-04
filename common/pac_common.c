@@ -20,6 +20,10 @@ const int APP_DELAY = 10;
 //Pacman life
 int PACMAN_LIFE = 3;
 
+//Score
+int GAME_SCORE = 0;
+int GAME_CURRENT_SCORE = 0;
+
 //The window we'll be rendering to
 SDL_Window *gWindow = NULL;
 

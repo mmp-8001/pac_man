@@ -18,6 +18,8 @@ extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
 extern const int APP_DELAY;
 extern int PACMAN_LIFE;
+extern int GAME_SCORE;
+extern int GAME_CURRENT_SCORE;
 extern SDL_Window *gWindow;
 extern SDL_Renderer *gRenderer;
 extern TTF_Font *gFont;

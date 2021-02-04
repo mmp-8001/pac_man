@@ -311,7 +311,7 @@ static bool pacman_touch_ghost(SDL_Rect pac, SDL_Rect ghost) {
     g_col = (ghost.x + 15) / ghost.w;
     g_row = (ghost.y + 15) / ghost.h;
 
-    //If seed in current position eat that
+    //If ghost in current position returen tru
     if (g_col == p_col && g_row == p_row) return true;
     return false;
 }
