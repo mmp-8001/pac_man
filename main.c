@@ -60,6 +60,11 @@ void start_game() {
     if (!BUTTON_init(&no_box, "NO"))status = QUIT;
     pause_load(&paused_text, &quit_text);
 
+    //Heart loaded section
+    TEXTURE heart;
+    TEXTURE_init(1, &heart);
+    TEXTURE_loadFromFile(&heart, "../assets/heart.png");
+
     while (status == RESTART) {
         //Create map
         Tile ***tileSet = MAP_init();
@@ -96,7 +101,6 @@ void start_game() {
                             status = PAUSED_STATE;
                             pause(&paused_text, &quit_text, &resume_box, &quit_box, &yes_box, &no_box, &e, &status);
                         }
-                        if (e.key.keysym.sym == SDLK_F1) status = RESTART;
                     }
                 }
                 //Pacman logic
@@ -130,6 +134,9 @@ void start_game() {
                 GHOST_render(&inky);
                 GHOST_render(&clyde);
 
+                //Render pacman life
+                MAP_life_render(&heart);
+
                 //Control speed of app
                 SDL_Delay(APP_DELAY);
 
@@ -137,6 +144,7 @@ void start_game() {
                 SDL_RenderPresent(gRenderer);
 
                 if (PACMAN_killed(&pacMan, tileSet, pinky.gBox, inky.gBox, clyde.gBox, blinky.gBox))status = KILLED;
+                if (PACMAN_LIFE == 0)status = RESTART;
             }
 
             //Destroy all objects in app
@@ -156,6 +164,7 @@ void start_game() {
     BUTTON_terminate(&quit_box);
     BUTTON_terminate(&yes_box);
     BUTTON_terminate(&no_box);
+    TEXTURE_free(&heart);
 }
 
 //Implement start section of game

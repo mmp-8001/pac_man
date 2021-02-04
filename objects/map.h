@@ -52,4 +52,7 @@ extern int MAP_tile_distance(Tile a, Tile b);
 //Extern map is wall to check if is wall
 extern bool MAP_is_wall(Tile *tile);
 
+//Extern this function to render pacman life
+extern void MAP_life_render(TEXTURE *obj);
+
 #endif //PAC_MAN_MAP_H

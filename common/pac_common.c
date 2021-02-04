@@ -15,7 +15,10 @@ const int SCREEN_WIDTH = 690;
 const int SCREEN_HEIGHT = 720;
 
 //Control app speed
-int const APP_DELAY = 10;
+const int APP_DELAY = 10;
+
+//Pacman life
+int PACMAN_LIFE = 3;
 
 //The window we'll be rendering to
 SDL_Window *gWindow = NULL;

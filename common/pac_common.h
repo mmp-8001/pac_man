@@ -17,6 +17,7 @@ extern const char gAppName[];
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
 extern const int APP_DELAY;
+extern int PACMAN_LIFE;
 extern SDL_Window *gWindow;
 extern SDL_Renderer *gRenderer;
 extern TTF_Font *gFont;

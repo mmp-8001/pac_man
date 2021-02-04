@@ -359,7 +359,8 @@ extern bool PACMAN_killed(PACMAN *pac, Tile ***tileSet, SDL_Rect a, SDL_Rect b, 
         !pacman_touch_ghost(pac->pBox, c) && !pacman_touch_ghost(pac->pBox, d))
         return false;
 
-    Mix_PlayChannel(-1, PAC_MAN_DIE_AUDIO, 0);
+    Mix_PlayChannel(-1, PAC_MAN_DIE_AUDIO, 0);\
+    PACMAN_LIFE -= 1;
     while (animation) {
         //Clear screen
         SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
@@ -383,7 +384,7 @@ extern bool PACMAN_killed(PACMAN *pac, Tile ***tileSet, SDL_Rect a, SDL_Rect b, 
     return true;
 }
 
-//This function load audio in map
+//This function load pacman die audio
 static void load_audio() {
     //Load audio
     PAC_MAN_DIE_AUDIO = Mix_LoadWAV("../assets/pac_die.wav");

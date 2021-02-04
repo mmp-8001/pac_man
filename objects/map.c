@@ -77,6 +77,9 @@ extern Tile ***MAP_init() {
     //Load map's audio
     load_audio();
 
+    //Set life again
+    PACMAN_LIFE = 3;
+
     //Load tiles pic and proper clip array
     create_tile();
     return tileSet;
@@ -387,4 +390,14 @@ static bool out_of_map(SDL_Rect box) {
 extern int MAP_tile_distance(Tile a, Tile b) {
     return (pow((a.mBox.x + TILE_WIDTH / 2) - (b.mBox.x + TILE_WIDTH / 2), 2) +
             pow((a.mBox.y + TILE_HEIGHT / 2) - (b.mBox.y + TILE_HEIGHT / 2), 2));
+}
+
+//This function render pacman life
+extern void MAP_life_render(TEXTURE *obj) {
+    int x = 30;
+    //Pac man life
+    for (int i = 0; i < PACMAN_LIFE; ++i) {
+        TEXTURE_render_ord(obj, x, SCREEN_HEIGHT - obj->mHeight - 19);
+        x += obj->mWidth + 5;
+    }
 }
