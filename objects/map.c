@@ -20,45 +20,11 @@ static bool out_of_map(SDL_Rect box);
 
 static void set_score();
 
-//Variables for app
-const int MAP_COL = 23;
-const int MAP_ROW = 24;
-
 //Global variable for this file
-static const int TILE_WIDTH = 30;
-static const int TILE_HEIGHT = 30;
 static char TILES_PIC[] = "../assets/tiles.png";
 static SDL_Rect gTileClips[8];
 static TEXTURE gTileTexture;
 static Mix_Chunk *gPacmanMunch = NULL;
-
-//Map simulator for testing
-unsigned short int map[24][23] = {
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-        {0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0},
-        {0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0},
-        {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-        {0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0},
-        {0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0},
-        {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0},
-        {1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1},
-        {0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0},
-        {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-        {0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0},
-        {0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0},
-        {0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0},
-        {0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0},
-        {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
-        {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-};
 
 //This function initialize map
 extern Tile ***MAP_init() {
@@ -125,8 +91,8 @@ static void get_tile_type(Tile *tile, int row, int col) {
     short int up = 1, down = 1, right = 1, left = 1;
 
     //If we have walkable tile or seed tile so we can choose them without any further effort
-    if (map[row][col] == TILE_TRANS || map[row][col] == TILE_SEED) {
-        if (map[row][col] == TILE_TRANS) {
+    if (GAME_MAP[row][col] == TILE_TRANS || GAME_MAP[row][col] == TILE_SEED) {
+        if (GAME_MAP[row][col] == TILE_TRANS) {
             tile->mType = TILE_TRANS;
             return;
         }
@@ -134,10 +100,10 @@ static void get_tile_type(Tile *tile, int row, int col) {
         return;
     }
     //So if we deal with wall find it's up and right and down and left tile
-    up = (0 <= row - 1 && map[row - 1][col] != 0) ? 2 : 1;
-    right = (col + 1 < MAP_COL && map[row][col + 1] != 0) ? 2 : 1;
-    down = (row + 1 < MAP_ROW && map[row + 1][col] != 0) ? 2 : 1;
-    left = (0 <= col - 1 && map[row][col - 1] != 0) ? 2 : 1;
+    up = (0 <= row - 1 && GAME_MAP[row - 1][col] != 0) ? 2 : 1;
+    right = (col + 1 < MAP_COL && GAME_MAP[row][col + 1] != 0) ? 2 : 1;
+    down = (row + 1 < MAP_ROW && GAME_MAP[row + 1][col] != 0) ? 2 : 1;
+    left = (0 <= col - 1 && GAME_MAP[row][col - 1] != 0) ? 2 : 1;
 
     //3 wall and 1 not wall
     if (up * right * down * left == 2) {
@@ -412,9 +378,9 @@ extern void MAP_life_render(TEXTURE *obj) {
 //This function set score of map
 static void set_score() {
     GAME_SCORE = 0;
-    for (int i = 0; i < 24; ++i) {
-        for (int j = 0; j < 23; ++j) {
-            if (map[i][j] == 2)GAME_SCORE++;
+    for (int i = 0; i < MAP_ROW; ++i) {
+        for (int j = 0; j < MAP_COL; ++j) {
+            if (GAME_MAP[i][j] == 2)GAME_SCORE++;
         }
     }
 }

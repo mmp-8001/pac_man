@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_mixer.h"
@@ -14,12 +15,21 @@
 
 //Variable which want to use across all files
 extern const char gAppName[];
-extern const int SCREEN_WIDTH;
-extern const int SCREEN_HEIGHT;
+extern int SCREEN_WIDTH;
+extern int SCREEN_HEIGHT;
 extern const int APP_DELAY;
 extern int PACMAN_LIFE;
 extern int GAME_SCORE;
 extern int GAME_CURRENT_SCORE;
+extern unsigned short int **GAME_MAP;
+extern int MAP_COL;
+extern int MAP_ROW;
+extern const int TILE_WIDTH;
+extern const int TILE_HEIGHT;
+extern int PACMAN_START_COL;
+extern int PACMAN_START_ROW;
+extern int GHOST_START_COL;
+extern int GHOST_START_ROW;
 extern SDL_Window *gWindow;
 extern SDL_Renderer *gRenderer;
 extern TTF_Font *gFont;

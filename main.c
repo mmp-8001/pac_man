@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
     //Init app and check dependencies
     if (!app_init()) {
         printf("Failed to initialize the app!\n");
+        app_close();
         return 1;
     }
     //Start game
@@ -79,17 +80,17 @@ void start_game() {
         while (status == KILLED) {
             //Create pacman
             PACMAN pacMan;
-            PACMAN_init(&pacMan, 150, 90);
+            PACMAN_init(&pacMan, PACMAN_START_COL * TILE_WIDTH, PACMAN_START_ROW * TILE_HEIGHT);
 
             //Create ghosts
             GHOST pinky;
-            GHOST_init(&pinky, 30, 90, "PINKY");
+            GHOST_init(&pinky, GHOST_START_COL * TILE_WIDTH, GHOST_START_ROW * TILE_HEIGHT, "PINKY");
             GHOST blinky;
-            GHOST_init(&blinky, 330, 300, "BLINKY");
+            GHOST_init(&blinky, GHOST_START_COL * TILE_WIDTH, GHOST_START_ROW * TILE_HEIGHT, "BLINKY");
             GHOST inky;
-            GHOST_init(&inky, 510, 480, "INKY");
+            GHOST_init(&inky, GHOST_START_COL * TILE_WIDTH, GHOST_START_ROW * TILE_HEIGHT, "INKY");
             GHOST clyde;
-            GHOST_init(&clyde, 30, 480, "CLYDE");
+            GHOST_init(&clyde, GHOST_START_COL * TILE_WIDTH, GHOST_START_ROW * TILE_HEIGHT, "CLYDE");
 
             status = PLAYING;
 

@@ -8,10 +8,6 @@
 #include "../common/pac_common.h"
 #include "../main/texture.h"
 
-//Variables for app
-extern const int MAP_ROW;
-extern const int MAP_COL;
-
 //Wall type enum
 typedef enum {
     TILE_WALL_PARALLEL,
