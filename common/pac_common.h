@@ -8,10 +8,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <time.h>
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_mixer.h"
 #include "SDL2/SDL_ttf.h"
+
+//Define game status
+typedef enum {
+    PAUSED_STATE, QUIT_STATE, RESTART, KILLED, PLAYING, QUIT
+} GAME_STATUS;
 
 //Variable which want to use across all files
 extern const char gAppName[];

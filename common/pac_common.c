@@ -60,7 +60,7 @@ extern bool app_init() {
     bool success = true;
 
     //Load map
-    if (!map_loader()) success = false;
+    if (!map_loader()) return false;
 
     //Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
@@ -153,7 +153,7 @@ static bool load_font() {
 static bool map_loader() {
     FILE *fp;
     char str[100];
-    int counter_r = 0, counter_c;
+    int counter_r = 0, counter_c, counter_c_last;
 
     //Opening file for reading
     fp = fopen("../map/default.txt", "r");
@@ -169,6 +169,15 @@ static bool map_loader() {
         for (int i = 0; str[i] != '\0' && str[i] != '\n'; ++i) {
             counter_c++;
         }
+        if (counter_r != 0) {
+            //If all column don't same count
+            if (counter_c != counter_c_last) {
+                printf("Invalid map\n");
+                fclose(fp);
+                return false;
+            }
+        }
+        counter_c_last = counter_c;
         counter_r++;
     }
     //Close file

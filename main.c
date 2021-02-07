@@ -3,12 +3,6 @@
 #include "objects/ghost.h"
 #include "objects/button.h"
 
-//Define game status
-typedef enum {
-    PAUSED_STATE, QUIT_STATE, RESTART, KILLED, PLAYING, QUIT
-} GAME_STATUS;
-
-
 //Prototype of our functions
 void start_game();
 
@@ -24,6 +18,11 @@ void set_score_texture(TEXTURE *score);
 int get_center_x(int w);
 
 int get_center_y(int h);
+
+void load_audio();
+
+void game_start(PACMAN *pacman, Tile ***tileSet, GHOST *pinky, GHOST *blinky, GHOST *inky, GHOST *clyde, TEXTURE *heart,
+                TEXTURE *score, GAME_STATUS *game_status, SDL_Event *e);
 
 int main(int argc, char *argv[]) {
     //Init app and check dependencies
@@ -94,6 +93,9 @@ void start_game() {
 
             status = PLAYING;
 
+            //Game start
+            game_start(&pacMan, tileSet, &pinky, &blinky, &inky, &clyde, &heart, &score, &status, &e);
+
             //Main loop, While application is running
             while (status == PLAYING) {
                 //Handle events on queue
@@ -153,7 +155,10 @@ void start_game() {
                 //Update screen
                 SDL_RenderPresent(gRenderer);
 
-                if (PACMAN_killed(&pacMan, tileSet, pinky.gBox, inky.gBox, clyde.gBox, blinky.gBox))status = KILLED;
+                //If pacman killed
+                if (PACMAN_killed(&pacMan, tileSet, pinky.gBox, inky.gBox, clyde.gBox, blinky.gBox, &status, &e))
+                    status = KILLED;
+
                 if (PACMAN_LIFE == 0) {
                     printf("FUCKING LOOSER");
                     status = RESTART;
@@ -249,7 +254,7 @@ void start_intro(TEXTURE *intro, TEXTURE *textTexture, SDL_Event e) {
     }
 }
 
-//Load what we want for pause sexrion
+//Load what we want for pause section
 void pause_load(TEXTURE *paused_text, TEXTURE *quit_text) {
     //Render paused text
     if (!TEXTURE_FromRenderedText(paused_text, "PAUSED", gTextColor)) {
@@ -359,6 +364,69 @@ void set_score_texture(TEXTURE *score) {
         }
     }
     last = GAME_CURRENT_SCORE;
+}
+
+//Section to start game
+void game_start(PACMAN *pacman, Tile ***tileSet, GHOST *pinky, GHOST *blinky, GHOST *inky, GHOST *clyde, TEXTURE *heart,
+                TEXTURE *score, GAME_STATUS *game_status, SDL_Event *e) {
+    bool animation = true;
+    Mix_Chunk *game_start_audio = NULL;
+    int init_time = SDL_GetTicks();
+
+    //Load audio
+    game_start_audio = Mix_LoadWAV("../assets/game_start.wav");
+    if (game_start_audio == NULL) {
+        printf("Failed to load game start audio! SDL_mixer Error: %s\n", Mix_GetError());
+        *game_status = QUIT;
+        return;
+    }
+    //Play audio
+    Mix_PlayChannel(-1, game_start_audio, 0);
+    while (animation) {
+        //Handle events on queue
+        while (SDL_PollEvent(e) != 0) {
+            //User requests quit
+            if (e->type == SDL_QUIT) {
+                *game_status = QUIT;
+                return;
+            }
+        }
+
+        //Clear screen
+        SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
+        SDL_RenderClear(gRenderer);
+
+        //Render map
+        MAP_render(tileSet);
+
+        //Render pacman to window
+        PACMAN_render(pacman);
+
+        //Render ghosts
+        GHOST_render(pinky);
+        GHOST_render(blinky);
+        GHOST_render(inky);
+        GHOST_render(clyde);
+
+        //Render pacman life
+        MAP_life_render(heart);
+
+        //Set score texture
+        set_score_texture(score);
+        TEXTURE_render_ord(score, 30, 25);
+
+        //Control speed of app
+        SDL_Delay(APP_DELAY);
+
+        //Update screen
+        SDL_RenderPresent(gRenderer);
+
+        //Be in this loop
+        if (init_time + 4500 < SDL_GetTicks()) animation = false;
+    }
+    //Free die audio
+    Mix_FreeChunk(game_start_audio);
+    game_start_audio = NULL;
 }
 
 //Place object in center of x axis

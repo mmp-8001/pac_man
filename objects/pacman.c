@@ -350,18 +350,33 @@ static void create_status() {
 }
 
 //This function implement pacman die animation
-extern bool PACMAN_killed(PACMAN *pac, Tile ***tileSet, SDL_Rect a, SDL_Rect b, SDL_Rect c, SDL_Rect d) {
+extern bool
+PACMAN_killed(PACMAN *pac, Tile ***tileSet, SDL_Rect a, SDL_Rect b, SDL_Rect c, SDL_Rect d, GAME_STATUS *game_status,
+              SDL_Event *e) {
     bool animation = true;
-    int s_counter = 0, angel = 0;
+    int angel = 0;
+    int init_time = SDL_GetTicks();
 
     //Check if pacman touches ghosts
     if (!pacman_touch_ghost(pac->pBox, a) && !pacman_touch_ghost(pac->pBox, b) &&
         !pacman_touch_ghost(pac->pBox, c) && !pacman_touch_ghost(pac->pBox, d))
         return false;
 
-    Mix_PlayChannel(-1, PAC_MAN_DIE_AUDIO, 0);\
+    //Play audio
+    Mix_PlayChannel(-1, PAC_MAN_DIE_AUDIO, 0);
+
+    //Decrease pacman life
     PACMAN_LIFE -= 1;
+
     while (animation) {
+        //Handle events on queue
+        while (SDL_PollEvent(e) != 0) {
+            //User requests quit
+            if (e->type == SDL_QUIT) {
+                *game_status = QUIT;
+                return false;
+            }
+        }
         //Clear screen
         SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
         SDL_RenderClear(gRenderer);
@@ -379,7 +394,7 @@ extern bool PACMAN_killed(PACMAN *pac, Tile ***tileSet, SDL_Rect a, SDL_Rect b, 
         SDL_RenderPresent(gRenderer);
 
         //Be in this loop
-        if (s_counter++ == 150) animation = false;
+        if (init_time + 2000 < SDL_GetTicks()) animation = false;
     }
     return true;
 }
