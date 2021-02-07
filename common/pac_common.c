@@ -38,6 +38,8 @@ SDL_Renderer *gRenderer = NULL;
 TTF_Font *gFont = NULL;
 static char *FONT_PATH = "../assets/ARCADE_R.ttf";
 SDL_Color gTextColor = {255, 255, 255};
+SDL_Color gTextColor_gameOver = {179, 23, 28};
+SDL_Color gTextColor_gameWon = {226, 182, 3};
 
 //Button color
 SDL_Color BUTTON_ON_HOVER_COLOR = {255, 255, 255};

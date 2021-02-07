@@ -19,10 +19,12 @@ int get_center_x(int w);
 
 int get_center_y(int h);
 
-void load_audio();
-
 void game_start(PACMAN *pacman, Tile ***tileSet, GHOST *pinky, GHOST *blinky, GHOST *inky, GHOST *clyde, TEXTURE *heart,
                 TEXTURE *score, GAME_STATUS *game_status, SDL_Event *e);
+
+void game_over(GAME_STATUS *game_status, SDL_Event *e);
+
+void game_won(GAME_STATUS *game_status, SDL_Event *e);
 
 int main(int argc, char *argv[]) {
     //Init app and check dependencies
@@ -40,6 +42,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+//App
 void start_game() {
     //Main loop flag
     GAME_STATUS status = RESTART;
@@ -159,12 +162,15 @@ void start_game() {
                 if (PACMAN_killed(&pacMan, tileSet, pinky.gBox, inky.gBox, clyde.gBox, blinky.gBox, &status, &e))
                     status = KILLED;
 
+                //Pacman game over
                 if (PACMAN_LIFE == 0) {
-                    printf("FUCKING LOOSER");
+                    game_over(&status, &e);
                     status = RESTART;
                 }
+
+                //Pacman won a game
                 if (GAME_CURRENT_SCORE == GAME_SCORE) {
-                    printf("WON");
+                    game_won(&status, &e);
                     status = RESTART;
                 };
             }
@@ -228,15 +234,11 @@ void start_intro(TEXTURE *intro, TEXTURE *textTexture, SDL_Event e) {
 
         //Set alpha and render intro pic
         TEXTURE_set_alpha(intro, intro_alpha);
-        TEXTURE_render(intro, SCREEN_WIDTH / 2 - intro->mWidth / 2, SCREEN_HEIGHT / 2 - intro->mHeight / 2, NULL, 0.0,
-                       NULL, SDL_FLIP_NONE);
+        TEXTURE_render_ord(intro, SCREEN_WIDTH / 2 - intro->mWidth / 2, SCREEN_HEIGHT / 2 - intro->mHeight / 2);
 
 
         TEXTURE_set_alpha(textTexture, text_alpha);
-        TEXTURE_render(textTexture, SCREEN_WIDTH / 2 - textTexture->mWidth / 2, SCREEN_HEIGHT / 2 + intro->mHeight,
-                       NULL,
-                       0.0,
-                       NULL, SDL_FLIP_NONE);
+        TEXTURE_render_ord(textTexture, SCREEN_WIDTH / 2 - textTexture->mWidth / 2, SCREEN_HEIGHT / 2 + intro->mHeight);
 
         //Faded animation simulation
         if (intro_alpha < 255) intro_alpha++;
@@ -388,6 +390,9 @@ void game_start(PACMAN *pacman, Tile ***tileSet, GHOST *pinky, GHOST *blinky, GH
             //User requests quit
             if (e->type == SDL_QUIT) {
                 *game_status = QUIT;
+                //Free game start audio
+                Mix_FreeChunk(game_start_audio);
+                game_start_audio = NULL;
                 return;
             }
         }
@@ -424,7 +429,7 @@ void game_start(PACMAN *pacman, Tile ***tileSet, GHOST *pinky, GHOST *blinky, GH
         //Be in this loop
         if (init_time + 4500 < SDL_GetTicks()) animation = false;
     }
-    //Free die audio
+    //Free game start audio
     Mix_FreeChunk(game_start_audio);
     game_start_audio = NULL;
 }
@@ -437,4 +442,99 @@ int get_center_x(int w) {
 //Place object in center of y axis
 int get_center_y(int h) {
     return (int) (SCREEN_HEIGHT / 2 - h / 2);
+}
+
+void game_over(GAME_STATUS *game_status, SDL_Event *e) {
+    TEXTURE game_over;
+    TEXTURE_init(1, &game_over);
+    bool animation = true;
+    int init_time = SDL_GetTicks();
+
+    //Render text
+    if (!TEXTURE_FromRenderedText(&game_over, "GAME OVER", gTextColor_gameOver)) {
+        printf("Failed to render text texture!\n");
+        *game_status = QUIT;
+        return;
+    }
+    while (animation) {
+        //Handle events on queue
+        while (SDL_PollEvent(e) != 0) {
+            //User requests quit
+            if (e->type == SDL_QUIT) {
+                //Set game status to quit
+                *game_status = QUIT;
+
+                //Free texture
+                TEXTURE_free(&game_over);
+                return;
+            }
+        }
+
+        //Clear screen
+        SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
+        SDL_RenderClear(gRenderer);
+
+        //Render game over texture
+        TEXTURE_render_ord(&game_over, SCREEN_WIDTH / 2 - game_over.mWidth / 2,
+                           SCREEN_HEIGHT / 2 - game_over.mHeight / 2);
+
+        //Control speed of app
+        SDL_Delay(APP_DELAY);
+
+        //Update screen
+        SDL_RenderPresent(gRenderer);
+
+        //Be in this loop
+        if (init_time + 1500 < SDL_GetTicks()) animation = false;
+    }
+
+    //Free texture
+    TEXTURE_free(&game_over);
+}
+
+void game_won(GAME_STATUS *game_status, SDL_Event *e) {
+    TEXTURE game_won;
+    TEXTURE_init(1, &game_won);
+    bool animation = true;
+    int init_time = SDL_GetTicks();
+
+    //Render text
+    if (!TEXTURE_FromRenderedText(&game_won, "Congratulations! You Won", gTextColor_gameWon)) {
+        printf("Failed to render text texture!\n");
+        *game_status = QUIT;
+        return;
+    }
+    while (animation) {
+        //Handle events on queue
+        while (SDL_PollEvent(e) != 0) {
+            //User requests quit
+            if (e->type == SDL_QUIT) {
+                //Set game status to quit
+                *game_status = QUIT;
+
+                //Free texture
+                TEXTURE_free(&game_won);
+                return;
+            }
+        }
+
+        //Clear screen
+        SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
+        SDL_RenderClear(gRenderer);
+
+        //Render game won texture
+        TEXTURE_render_ord(&game_won, SCREEN_WIDTH / 2 - game_won.mWidth / 2, SCREEN_HEIGHT / 2 - game_won.mHeight / 2);
+
+        //Control speed of app
+        SDL_Delay(APP_DELAY);
+
+        //Update screen
+        SDL_RenderPresent(gRenderer);
+
+        //Be in this loop
+        if (init_time + 1500 < SDL_GetTicks()) animation = false;
+    }
+
+    //Free texture
+    TEXTURE_free(&game_won);
 }
