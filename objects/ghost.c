@@ -125,12 +125,12 @@ extern void GHOST_move(GHOST *gObj, PACMAN *pObj, Tile ***tileSet, GHOST blinky)
     bool not_get_back = true;
 
     //Get tile which pacman is in
-    p_col = (pObj->pBox.x) / 30;
-    p_row = (pObj->pBox.y) / 30;
+    p_col = (pObj->pBox.x) / TILE_WIDTH;
+    p_row = (pObj->pBox.y) / TILE_HEIGHT;
 
     //Get tile which ghost is in
-    g_col = (gObj->gBox.x) / 30;
-    g_row = (gObj->gBox.y) / 30;
+    g_col = (gObj->gBox.x) / TILE_WIDTH;
+    g_row = (gObj->gBox.y) / TILE_HEIGHT;
 
     //If completely in tile
     if (tileSet[g_row][g_col]->mBox.x == gObj->gBox.x && tileSet[g_row][g_col]->mBox.y == gObj->gBox.y) {
@@ -202,10 +202,10 @@ extern void GHOST_move(GHOST *gObj, PACMAN *pObj, Tile ***tileSet, GHOST blinky)
                     pObj->pMove == SDLK_UP ? d_new_row -= 2 : 0;
                     pObj->pMove == SDLK_RIGHT ? d_new_col += 2 : 0;
                     pObj->pMove == SDLK_LEFT ? d_new_col -= 2 : 0;
-                    d_new_col = ((blinky.gBox.x / 30)) + (2 * (d_new_col - (blinky.gBox.x / 30)));
-                    d_new_row = (blinky.gBox.y / 30) + (2 * (d_new_row - (blinky.gBox.y / 30)));
+                    d_new_col = ((blinky.gBox.x / TILE_WIDTH)) + (2 * (d_new_col - (blinky.gBox.x / TILE_WIDTH)));
+                    d_new_row = (blinky.gBox.y / TILE_HEIGHT) + (2 * (d_new_row - (blinky.gBox.y / TILE_HEIGHT)));
                 } else if (strcmp(gObj->gName, "CLYDE") == 0) {//Implement chase mood of clyde
-                    if (abs(g_col - p_col) <= 8 || abs(g_row - p_row) <= 8)d_new_row = 25, d_new_col = 0;
+                    if (abs(g_col - p_col) <= 4 || abs(g_row - p_row) <= 4)d_new_row = MAP_ROW, d_new_col = 0;
                 }
                 POINT next_move = shortest_path(gObj, tileSet, g_row, g_col, d_new_row, d_new_col);
                 if (next_move.pRow == g_row && next_move.pCol == g_col)
