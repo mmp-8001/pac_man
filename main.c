@@ -108,6 +108,8 @@ void start_game() {
                         status = QUIT;
                     }
                     if (e.type == SDL_KEYDOWN) {
+                        PACMAN_handle(&pacMan, tileSet, e);
+
                         if (e.key.keysym.sym == SDLK_ESCAPE) {
                             status = PAUSED_STATE;
                             pause(&paused_text, &quit_text, &resume_box, &quit_box, &yes_box, &no_box, &e, &status);

@@ -22,7 +22,7 @@ static const int PACMAN_HEIGHT = 30;
 static const int PACMAN_VEL = 1;
 static const int WALKING_ANIMATION_FRAMES = 5;
 static const int ANIMATION_DELAY = 5;
-static const int PACMAN_NEXT_MOVE = 45;
+static const int PACMAN_NEXT_MOVE = 200;
 static const int PACMAN_SOFT = 5;
 static char PACMAN_PIC[] = "../assets/pacman.png";
 static SDL_Rect PACMAN_SPRITE_CLIP[5];
