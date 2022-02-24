@@ -7,4 +7,4 @@ You can find out some useful concepts in game programming with it.
 
 Hope that helps you :)
 
-![alt text](https://github.com/mmp-8001/pac_man/env-pic.png?raw=true)
+![alt text](https://github.com/mmp-8001/pac_man/blob/master/env-pic.png?raw=true)
