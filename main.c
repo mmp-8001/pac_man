@@ -26,8 +26,14 @@ void game_over(GAME_STATUS *game_status, SDL_Event *e);
 
 void game_won(GAME_STATUS *game_status, SDL_Event *e);
 
+// TODO: 1- Make Pacman Go Through Edges
+// TODO: 2- Pacman Power
+// TODO: 3- Static Lib
+// TODO: 4- Map Creator
+// TODO: 5- Create Menu
+
 int main(int argc, char *argv[]) {
-    //Init app and check dependencies
+    // Init app and check dependencies
     if (!app_init()) {
         printf("Failed to initialize the app!\n");
         app_close();

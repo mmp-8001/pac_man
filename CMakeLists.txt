@@ -12,3 +12,8 @@ link_directories(${PROJECT_SOURCE_DIR}/lib)
 
 add_executable(pac_man ${SOURCE_FILES})
 target_link_libraries(pac_man mingw32 SDL2main SDL2 SDL2_image SDL2_mixer SDL2_ttf)
+
+add_custom_command(TARGET pac_man POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/dlls"
+        $<TARGET_FILE_DIR:pac_man>)
